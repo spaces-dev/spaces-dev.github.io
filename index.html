@@ -1,11 +1,95 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>github pages</title>
-</head>
-<body>
-    <h1>initial commit</h1>
-</body>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Spaces+ :: Backgrounds & Sounds</title>
+		<link rel="icon" href="favicon.png">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+		<style>
+			.card-body {
+				text-align: center;
+			}
+			.col-md-4 {
+				margin-bottom: 2rem;
+			}
+			.nav-tabs {
+				margin-bottom: 1rem;
+			}
+			.btn > btn-primary, .btn-block {
+				border-top-left-radius: unset;
+				border-top-right-radius: unset;
+			}
+			.player {
+				width: 80%;
+				margin-bottom: -1rem;
+			}
+			.list-group-item {
+				padding: 6px 6px;
+			}
+		</style>
+	</head>
+	<body>
+	<div class="container">
+		<div class="py-5">
+			<ul class="nav nav-pills mb-3" id="myTab" role="tablist">
+				<li class="nav-item">
+					<a class="nav-link active" id="backgrounds-tab" data-toggle="tab" href="#backgrounds" role="tab" aria-controls="backgrounds" aria-selected="true">Фоны <span class="badge badge-light" id="bg-data"></span></a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" id="sounds-tab" data-toggle="tab" href="#sounds" role="tab" aria-controls="sounds" aria-selected="false">Звуки <span class="badge badge-light" id="sn-data"></span></a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="spaces_plus.user.js">Скачать Spaces+</a>
+				</li>
+			</ul>
+			<div class="tab-content" id="myTabContent">
+				<div class="tab-pane fade show active" id="backgrounds" role="tabpanel" aria-labelledby="backgrounds-tab"></div>
+				<div class="tab-pane fade" id="sounds" role="tabpanel" aria-labelledby="sounds-tab"><div class="card"><ul class="list-group list-group-flush" id="sounds_rel"></ul></div></div>
+			</div>
+		</div>
+	</div>
+	<script>
+		$.getJSON('data.json', function(data) {
+			$(function() {
+				for(var i = 0; i < data.backgrounds.length;) {
+					$tr = $('<div class="row">');
+					$tr.append(
+						$('<div class="col-md-4"><div class="card"><div class="card-block"><img class="card-img-top" src="' + data.backgrounds[i].url + '" alt="' + data.backgrounds[i].url + '" id="' + data.backgrounds[i].name + '"><input type="button" class="btn btn-primary btn-block" value="Скопировать" onclick="copy(\'' + data.backgrounds[i].name + '\')"></div></div></div>')
+					);
+					i+=1
+					$tr.append(
+						$('<div class="col-md-4"><div class="card"><div class="card-block"><img class="card-img-top" src="' + data.backgrounds[i].url + '" alt="' + data.backgrounds[i].url + '" id="' + data.backgrounds[i].name + '"><input type="button" class="btn btn-primary btn-block" value="Скопировать" onclick="copy(\'' + data.backgrounds[i].name + '\')"></div></div></div>')
+					);
+					i+=1
+					$tr.append(
+						$('<div class="col-md-4"><div class="card"><div class="card-block"><img class="card-img-top" src="' + data.backgrounds[i].url + '" alt="' + data.backgrounds[i].url + '" id="' + data.backgrounds[i].name + '"><input type="button" class="btn btn-primary btn-block" value="Скопировать" onclick="copy(\'' + data.backgrounds[i].name + '\')"></div></div></div>')
+					);
+					i+=1
+					$tr.appendTo('#backgrounds');
+				};
+				$("#bg-data").append(data.backgrounds.length);
+			});
+			$(function() {
+				$.each(data.sounds, function(index, item) {
+					$("#sounds_rel").append('<li class="list-group-item"><audio class="player" controls><source src="'+ item.url +'" type="'+ item.type +'"></audio><button class="btn btn-primary float-right ml-auto" style="padding: 0.375rem 0.75rem;" onclick="window.open(\'' + item.url + '\')">Скопировать</button></li>')
+				});
+				$("#sn-data").append(data.sounds.length);
+			});
+		});
+		function copy(elm) {
+			var img = document.getElementById(elm);
+			var r = document.createRange();
+			r.setStartBefore(img);
+			r.setEndAfter(img);
+			r.selectNode(img);
+			var sel = window.getSelection();
+			sel.addRange(r);
+			document.execCommand('Copy');
+			sel.removeRange(r);
+		};
+	</script>
+	</body>
 </html>
