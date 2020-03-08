@@ -1,64 +1,116 @@
 {
-	"backgrounds": [{
-		"name": "default",
-		"url": "https://spaces-dev.github.io/src/backgrounds/default.jpg"
-	}, {
-		"name": "bananas",
-		"url": "https://spaces-dev.github.io/src/backgrounds/bananas.jpg"
-	}, {
-		"name": "cats",
-		"url": "https://spaces-dev.github.io/src/backgrounds/cats.jpg"
-	}, {
-		"name": "ethnic-binary",
-		"url": "https://spaces-dev.github.io/src/backgrounds/ethnic-binary.jpg"
-	}, {
-		"name": "hearts",
-		"url": "https://spaces-dev.github.io/src/backgrounds/hearts.jpg"
-	}, {
-		"name": "skull-and-bones",
-		"url": "https://spaces-dev.github.io/src/backgrounds/skull-and-bones.jpg"
-	}, {
-		"name": "water",
-		"url": "https://spaces-dev.github.io/src/backgrounds/water.jpg"
-	}, {
-		"name": "stars",
-		"url": "https://spaces-dev.github.io/src/backgrounds/stars.gif"
-	}, {
-		"name": "yellow-leaves",
-		"url": "https://spaces-dev.github.io/src/backgrounds/yellow-leaves.jpg"
-	}, {
-		"name": "10-years",
-		"url": "https://spaces-dev.github.io/src/backgrounds/10-years.png"
-	}, {
-		"name": "15bg",
-		"url": "https://spaces-dev.github.io/src/backgrounds/15bg.png"
-	}, {
-		"name": "triangle",
-		"url": "https://spaces-dev.github.io/src/backgrounds/triangle.jpg"
-	}],
-	"sounds": [{
-		"name": "default",
-		"url": "https://spaces-dev.github.io/src/sounds/default.ogg",
-		"type": "audio/ogg"
-	}, {
-		"name": "vk",
-		"url": "https://spaces-dev.github.io/src/sounds/vk.ogg",
-		"type": "audio/ogg"
-	}, {
-		"name": "telegram",
-		"url": "https://spaces-dev.github.io/src/sounds/tg.ogg",
-		"type": "audio/ogg"
-	}, {
-		"name": "icq",
-		"url": "https://spaces-dev.github.io/src/sounds/icq.ogg",
-		"type": "audio/ogg"
-	}, {
-		"name": "push",
-		"url": "https://spaces-dev.github.io/src/sounds/push.ogg",
-		"type": "audio/ogg"
-	}, {
-		"name": "notify",
-		"url": "https://spaces-dev.github.io/src/sounds/notify.ogg",
-		"type": "audio/ogg"
-	}]
+	"backgrounds": [
+		{
+			"name": "default",
+			"url": "https://spaces-dev.github.io/src/backgrounds/default.jpg"
+		},
+		{
+			"name": "bananas",
+			"url": "https://spaces-dev.github.io/src/backgrounds/bananas.jpg"
+		},
+		{
+			"name": "cats",
+			"url": "https://spaces-dev.github.io/src/backgrounds/cats.jpg"
+		},
+		{
+			"name": "ethnic-binary",
+			"url": "https://spaces-dev.github.io/src/backgrounds/ethnic-binary.jpg"
+		},
+		{
+			"name": "hearts",
+			"url": "https://spaces-dev.github.io/src/backgrounds/hearts.jpg"
+		},
+		{
+			"name": "skull-and-bones",
+			"url": "https://spaces-dev.github.io/src/backgrounds/skull-and-bones.jpg"
+		},
+		{
+			"name": "water",
+			"url": "https://spaces-dev.github.io/src/backgrounds/water.jpg"
+		},
+		{
+			"name": "stars",
+			"url": "https://spaces-dev.github.io/src/backgrounds/stars.gif"
+		},
+		{
+			"name": "yellow-leaves",
+			"url": "https://spaces-dev.github.io/src/backgrounds/yellow-leaves.jpg"
+		},
+		{
+			"name": "10-years",
+			"url": "https://spaces-dev.github.io/src/backgrounds/10-years.png"
+		},
+		{
+			"name": "15bg",
+			"url": "https://spaces-dev.github.io/src/backgrounds/15bg.png"
+		},
+		{
+			"name": "triangle",
+			"url": "https://spaces-dev.github.io/src/backgrounds/triangle.jpg"
+		},
+		{
+			"name": "animal-eyes",
+			"url": "https://spaces-dev.github.io/src/backgrounds/animal-eyes.jpg"
+		},
+		{
+			"name": "cube",
+			"url": "https://spaces-dev.github.io/src/backgrounds/cube.jpg"
+		},
+		{
+			"name": "flowers",
+			"url": "https://spaces-dev.github.io/src/backgrounds/flowers.jpg"
+		},
+		{
+			"name": "girly-doodles",
+			"url": "https://spaces-dev.github.io/src/backgrounds/girly-doodles.jpg"
+		},
+		{
+			"name": "japanese-cranes",
+			"url": "https://spaces-dev.github.io/src/backgrounds/japanese-cranes.jpg"
+		},
+		{
+			"name": "round-circle",
+			"url": "https://spaces-dev.github.io/src/backgrounds/round-circle.jpg"
+		},
+		{
+			"name": "cicrle-flowers",
+			"url": "https://spaces-dev.github.io/src/backgrounds/cicrle-flowers.jpg"
+		},
+		{
+			"name": "square-texture",
+			"url": "https://spaces-dev.github.io/src/backgrounds/square-texture.jpg"
+		}
+	],
+	"sounds": [
+		{
+			"name": "default",
+			"url": "https://spaces-dev.github.io/src/sounds/default.ogg",
+			"type": "audio/ogg"
+		},
+		{
+			"name": "vk",
+			"url": "https://spaces-dev.github.io/src/sounds/vk.ogg",
+			"type": "audio/ogg"
+		},
+		{
+			"name": "telegram",
+			"url": "https://spaces-dev.github.io/src/sounds/tg.ogg",
+			"type": "audio/ogg"
+		},
+		{
+			"name": "icq",
+			"url": "https://spaces-dev.github.io/src/sounds/icq.ogg",
+			"type": "audio/ogg"
+		},
+		{
+			"name": "push",
+			"url": "https://spaces-dev.github.io/src/sounds/push.ogg",
+			"type": "audio/ogg"
+		},
+		{
+			"name": "notify",
+			"url": "https://spaces-dev.github.io/src/sounds/notify.ogg",
+			"type": "audio/ogg"
+		}
+	]
 }
