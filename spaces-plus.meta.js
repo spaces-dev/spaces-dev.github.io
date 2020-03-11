@@ -6,9 +6,9 @@
 // @icon        	https://spaces-dev.github.io/favicon.png
 // @include     	/^(http|https):\/\/(spaces\.ru|spac\.me|spcs\.me|spaces\.im|gdespaces\.com).*$/
 // @match       	*://(spaces.ru|spac.me|spcs.me|spaces.im|gdespaces.com)/*
-// @version     	2b216
+// @version     	2.1.7
 // @grant       	none
-// @require     	https://raw.githubusercontent.com/spaces-dev/spaces-dev.github.io/master/colorpicker.js
-// @downloadURL     https://raw.githubusercontent.com/spaces-dev/spaces-dev.github.io/master/spaces_plus.user.js
-// @updateURL       https://raw.githubusercontent.com/spaces-dev/spaces-dev.github.io/master/spaces_plus.meta.js
+// @require     	https://spaces-dev.github.io/colorpicker.js
+// @downloadURL     https://spaces-dev.github.io/spaces-plus.user.js
+// @updateURL       https://spaces-dev.github.io/spaces-plus.meta.js
 // ==/UserScript==

@@ -1,16 +1,16 @@
 // ==UserScript==
 // @name            Spaces+
 // @namespace       https://github.com/spaces-dev/SpacesPlus
-// @description     The script is designed to extend the functionality of Spaces.ru
+// @description     The script is designed to extend the functionality Spaces.ru
 // @author          Creator: Maximoff, Updated: crashmax & molimawka
 // @icon            https://spaces-dev.github.io/favicon.png
 // @include         /^(http|https):\/\/(spaces\.ru|spac\.me|spcs\.me|spaces\.im|gdespaces\.com).*$/
 // @match           *://(spaces.ru|spac.me|spcs.me|spaces.im|gdespaces.com)/*
-// @version         2b216
+// @version         2.1.7
 // @grant           none
-// @require         https://raw.githubusercontent.com/spaces-dev/spaces-dev.github.io/master/colorpicker.js
-// @downloadURL     https://raw.githubusercontent.com/spaces-dev/spaces-dev.github.io/master/spaces_plus.user.js
-// @updateURL       https://raw.githubusercontent.com/spaces-dev/spaces-dev.github.io/master/spaces_plus.meta.js
+// @require         https://spaces-dev.github.io/colorpicker.js
+// @downloadURL     https://spaces-dev.github.io/spaces-plus.user.js
+// @updateURL       https://spaces-dev.github.io/spaces-plus.meta.js
 // ==/UserScript==
 
 (function() {
@@ -18,7 +18,7 @@
         var _PROTOCOL = document.location.protocol.toString();
         var _DOMAIN = document.location.hostname.toString();
         var VERSION = 20;
-        var BUILD = 216;
+        var BUILD = 217;
         var onlineLock = null;
         var favLock = null;
         var favRLock = null;
@@ -52,6 +52,7 @@
             'sticker': true,
             'fixes': true,
             'bodystyle': true,
+            'upVersion': null,
             'bodystyleSetting': {
                 "url": "https://" + gitPages + "/src/backgrounds/default.jpg",
                 "color": '#DAE1E8',
@@ -70,7 +71,8 @@
             'friendsListSH': true,
             'friendsDisplay': true,
             'hideNotyf': {
-                "cookieEditor": false
+                "cookieEditor": false,
+                "configImport": false
             },
             'msgAlert': true,
             'msgAlertSettings': {
@@ -78,8 +80,7 @@
                 "maxAlert": 3,
                 "animDelay": 3,
                 "alertDelay": 3
-            },
-            'hideUp': null
+            }
         };
         var _SETSTRINGS = {
             'comments': "Пакетное удаление комментариев",
@@ -100,7 +101,7 @@
             'bodystyle': "Фон сайта",
             'msgAlert': "Уведомления почты",
             'sticker': "Бесплатные стикеры",
-            'fixes': "Разные исправления <span onclick='alert(\"Используеться для отката неудачных обновлений сайта (недавнее изменение в шапке), в будущем данная функция будет пополняться новыми исправлениями.\");' style=\"cursor: help; float: right;\" class=\"ico ico_question_light\"></span>"
+            'fixes': "Незначительные исправления"
         };
         var main = {
             ajax: function(url, method, data, callback, rstate, json) {
@@ -376,6 +377,17 @@
                                                             }
                                                         } else if (e.target.id == "sp_set_sticker") {
                                                             main.freeSticker(e.target.checked);
+                                                        } else if (e.target.id == "sp_set_fixes") {
+                                                            if (e.target.checked) {
+                                                                main.allFixes();
+                                                                main.alert("Незначительные исправления<div class='pad_t_a'></div><small class='pad_t_a grey'>Данная функция необходима для исправления неудачных обновлений сайта.<div class='pad_t_a'></div>Исправлено: <ul><li>Кнопка почты/ленты в шапке</li></ul></div>", 1, 1);
+                                                            } else {
+                                                                var eventAlert = main.qs("#SP_PLUS_ALERT");
+                                                                if (eventAlert) {
+                                                                    main.remove(eventAlert);
+                                                                }
+                                                                document.location.reload();
+                                                            }
                                                         }
                                                     }
                                                 });
@@ -427,26 +439,11 @@
                                         main.spacesAction(setArea);
                                         main.newbequest();
                                         setArea.appendChild(spActLbl2);
-                                        var tgLink = main.ce("a", {
-                                            href: (_PROTOCOL == "http:" ? "https:" : "http:") + "//" + _DOMAIN + "/settings/?sp_plus_settings=1",
-                                            class: "stnd-link stnd-link_arr disabled",
-                                            id: "sp_protocol_togl",
-                                            html: "<span class='b'><span class='" + (_PROTOCOL == "http:" ? "ico ico_locked" : "ico_chat ico_lock_open") + "'></span> Переключиться на " + (_PROTOCOL == "http:" ? "HTTPS" : "HTTP") + "-протокол<span class='ico ico_arr ico_m'></span></span>",
-                                            style: "font-size: small;",
-                                            onclick: function() {
-                                                /**
-                                                 * Временно отключена, т.к. сайт стал использовать HTTPS протокол по стандарту
-                                                 * document.location.href = (_PROTOCOL == "http:" ? "https:" : "http:") + "//" + _DOMAIN + "/settings/?sp_plus_settings=1";
-                                                 */
-                                                return false;
-                                            }
-                                        });
-                                        setArea.appendChild(tgLink);
                                         var cookEdit = main.ce("a", {
                                             href: _PROTOCOL + "//" + _DOMAIN + "/settings/?sp_plus_settings=1&sp_cookie_editor=1",
                                             class: "stnd-link stnd-link_arr",
                                             id: "sp_cookie_editor",
-                                            html: "<span class='b'><span class='ico ico_edit_dim'></span> Редактор Cookies<span class='ico ico_arr ico_m'></span></span>",
+                                            html: "<span class='b'><span class='ico ico_edit_dim'></span> Редактор cookies<span class='ico ico_arr ico_m'></span></span>",
                                             style: "font-size: small; border-bottom: unset;",
                                             onclick: function() {
                                                 var head = main.qs("#SP_PLUS_SETHEAD");
@@ -541,7 +538,7 @@
                                             html: "<span class='b' style='color: #f86934;'><span class='ico ico_alert'></span> Сброс настроек<span class='ico ico_arr ico_m'></span></span>",
                                             style: "font-size: small;",
                                             onclick: function() {
-                                                main.confirmm("Вы действительно хотите сбросить настройки?", warn = true, function() {
+                                                main.confirmm("Вы действительно хотите сбросить настройки?", 0, function() {
                                                     main.delCookie("SP_PLUS_SET");
                                                     main.delCookie("SP_PLUS_ONLINE");
                                                     main.delCookie("gp_left_btn");
@@ -565,7 +562,7 @@
                                         });
                                         var ver = main.ce("div", {
                                             style: "float: right;",
-                                            html: 'v' + main.rever(VERSION) + '.' + main.rever(BUILD)
+                                            html: 'v' + main.rever(BUILD)
                                         });
                                         var target = main.qs("#SP_PLUS_ABOUT");
                                         aboutWidget.appendChild(content);
@@ -835,13 +832,13 @@
                         attr: {
                             "for": "sp_set_bodystyle_URL"
                         },
-                        html: "Изображение"
+                        html: "Выбрать изображение"
                     });
                     var lblstyleclbl = main.ce("label", {
                         attr: {
                             "for": "sp_set_bodystyle_color"
                         },
-                        html: "Цвет"
+                        html: "Подобрать цвет"
                     });
                     div.appendChild(descInp);
                     div.appendChild(bstyle);
@@ -866,7 +863,8 @@
                     main.console.error('Ошибка (BODYSTYLE_SET): ' + e.name + ":" + e.message + "\n" + e.stack);
                 }
             },
-            bgColor: function(e) {
+            bgColor: function() {
+                var rev = main.service(1);
                 try {
                     if (!main.qs("#SP_WRAP_COLOR")) {
                         if (main.qs("#SP_WRAP_IMAGE")) {
@@ -877,12 +875,20 @@
                             rel: "stylesheet",
                             type: "text/css",
                             id: "SP_PLUS_CP_STYLE",
-                            href: "https://beta.spac.me/css/custom/CommentWidget/Toolbar.css"
+                            href: "https://" + gitPages + "/src/attaches/css/toolbar.css?r=" + rev
+                        });
+                        var style2 = main.ce("link", {
+                            rel: "stylesheet",
+                            type: "text/css",
+                            id: "SP_PLUS_CP_STYLE_2",
+                            href: "https://" + gitPages + "/src/attaches/css/user-content.css?r=" + rev
                         });
                         document.getElementsByTagName('head')[0].appendChild(style);
+                        document.getElementsByTagName('head')[0].appendChild(style2);
                         var SPB = main.qs("#SP_PLUS_BODYSTYLE");
                         var stdnC = main.ce("div", {
-                            id: "SP_WRAP_COLOR"
+                            id: "SP_WRAP_COLOR",
+                            style: "border-top: 1px solid #cdd4e1;"
                         });
                         var table = main.ce("table", {
                             class: "table__wrap bb-colorpicker"
@@ -963,7 +969,7 @@
                     main.console.error('Ошибка (BODYSTYLE_COLOR_SET): ' + e.name + ":" + e.message + "\n" + e.stack);
                 }
             },
-            bgImage: function(e) {
+            bgImage: function() {
                 try {
                     if (!main.qs("#SP_WRAP_IMAGE")) {
                         if (main.qs("#SP_WRAP_COLOR")) {
@@ -974,17 +980,18 @@
                             rel: "stylesheet",
                             type: "text/css",
                             id: "SP_PLUS_IMAGE_STYLE",
-                            href: "https://" + gitPages + "/src/styles/bodystyle.css"
+                            href: "https://" + gitPages + "/src/attaches/css/bodystyle.css?r=" + main.service(1)
                         })
                         document.getElementsByTagName('head')[0].appendChild(style)
                         var SPB = main.qs("#SP_PLUS_BODYSTYLE");
                         var stdnI = main.ce("div", {
-                            id: "SP_WRAP_IMAGE"
+                            id: "SP_WRAP_IMAGE",
+                            style: "border-top: 1px solid #cdd4e1;"
                         });
                         var gd = main.ce("div", {
                             class: "js-gallery_skip wbg oh tiles_block tiles_wrapper"
                         });
-                        main.ajax('https://' + gitPages + '/data.json', 'GET', null, function(data) {
+                        main.ajax('https://' + gitPages + '/data.json?r=' + main.service(1), 'GET', null, function(data) {
                             var data = JSON.parse(data)
                             for (var i = 0; i < data.backgrounds.length; i++) {
                                 var d1 = main.ce("div", {
@@ -1118,7 +1125,7 @@
                         html: '<span class="js-ico ico ico_demo"></span>',
                         style: "margin-left: 7px; font-size: small; top: 23px",
                         title: "Прослушать",
-                        onclick: function(e) {
+                        onclick: function() {
                             main.sound(_SETTINGS.events.url + "?r=" + main.rand(1000, 9999), _SETTINGS.events.volume);
                             return false;
                         }
@@ -1287,11 +1294,11 @@
                         target.innerHTML = "";
                         if (!_SETTINGS.hideNotyf.cookieEditor) {
                             var hideNotyf = main.ce("img", {
-                                class: "p16 m pointer right",
+                                class: "p16 m pointer right close_h",
                                 style: "padding: 10px;",
                                 src: _PROTOCOL + "//spac.me/i/remove.png",
                                 title: "Понятно, больше не показывать.",
-                                onclick: function(e) {
+                                onclick: function() {
                                     _SETTINGS.hideNotyf.cookieEditor = true;
                                     var jsonSet = JSON.stringify(_SETTINGS);
                                     main.setCookie("SP_PLUS_SET", jsonSet, null);
@@ -1301,7 +1308,7 @@
                             var smallInfo = main.ce("div", {
                                 class: "stnd-block-yellow",
                                 style: "padding: 15px;",
-                                html: '<span class="ico ico_alert"></span>Никому не сообщайте значения ваших cookies! Не делайте скриншот этой страницы, на котором будут видны эти значения! От этого зависит безопасность вашего аккаунта!'
+                                html: '<span class="ico ico_alert"></span>Внимание!</br></br><div style="font-size: small;">Никому не сообщайте значения ваших cookies! Не делайте скриншот этой страницы, на котором будут видны эти значения! От этого зависит безопасность вашего аккаунта!</div>'
                             });
                             var infoDiv = main.ce("div");
                             infoDiv.appendChild(hideNotyf);
@@ -1334,7 +1341,7 @@
                                 if ((name == "SP_PLUS_ONLINE" || name == "SP_PLUS_SET") && _X77hgg) {
                                     main.alert("Это служебное значение скрипта, не изменяйте его!", 1, null);
                                 } else if (name != "") {
-                                    main.confirmm((name == "SP_PLUS_ONLINE" || name == "SP_PLUS_SET" ? "<b style='color: #FF0000;'>Внимание, <span style='color: #0000FF;'>\"" + name + "\"</span> является служебным значение скрипта, не стоит его изменять!</b><br/>" : "") + "Хотите добавить куку <span style='color: #0000FF;'>\"" + name + "\"</span> со значением <span style='color: #0000FF;'>\"" + val + "\"</span>?", function() {
+                                    main.confirmm((name == "SP_PLUS_ONLINE" || name == "SP_PLUS_SET" ? "Внимание, <b>" + name + "</b> является служебным значение скрипта, не стоит его изменять!<br/>" : "") + "Вы действительно хотите добавить куку <b>" + name + "</b> со значением <b>" + val + "</b>?", 1, function() {
                                         main.setCookie(prev.previousElementSibling.value, prev.value, null);
                                         main.cookieEditor("#SP_PLUS_SETAREA");
                                     });
@@ -1389,7 +1396,7 @@
                                     if ((name == "SP_PLUS_ONLINE" || name == "SP_PLUS_SET") && _X77hgg) {
                                         main.alert("Это служебное значение скрипта, не удаляйте его!", 1, null);
                                     } else if (name != "") {
-                                        main.confirmm((name == "SP_PLUS_ONLINE" || name == "SP_PLUS_SET" ? "<b style='color: #FF0000;'>Внимание, <span style='color: #0000FF;'>\"" + name + "\"</span> является служебным значение скрипта, не стоит его удалять!</b><br/>" : "") + "Хотите удалить куку <span style='color: #0000FF;'>\"" + name + "\"</span>?", function() {
+                                        main.confirmm((name == "SP_PLUS_ONLINE" || name == "SP_PLUS_SET" ? "Внимание, <b>" + name + "</b> является служебным значение скрипта, не стоит его удалять!<br/>" : "") + "Вы действительно хотите удалить куку <b>" + name + "</b>?", 0, function() {
                                             main.delCookie(prev.value);
                                             main.cookieEditor("#SP_PLUS_SETAREA");
                                         });
@@ -1409,7 +1416,7 @@
                                     if ((name == "SP_PLUS_ONLINE" || name == "SP_PLUS_SET") && _X77hgg) {
                                         main.alert("Это служебное значение скрипта, не изменяйте его!", 1, null);
                                     } else if (name != "") {
-                                        main.confirmm((name == "SP_PLUS_ONLINE" || name == "SP_PLUS_SET" ? "<b style='color: #FF0000;'>Внимание, <span style='color: #0000FF;'>\"" + name + "\"</span> является служебным значение скрипта, не стоит его изменять!</b><br/>" : "") + "Хотите задать куке <span style='color: #0000FF;'>\"" + name + "\"</span> значение <span style='color: #0000FF;'>\"" + val + "\"</span>?", function() {
+                                        main.confirmm((name == "SP_PLUS_ONLINE" || name == "SP_PLUS_SET" ? "Внимание, \"" + name + "\"</b> является служебным значение скрипта, не стоит его изменять!<br/>" : "") + "Вы действительно хотите задать куке <b>\"" + name + "\"</b> значение <b>\"" + val + "\"</b>?", function() {
                                             main.setCookie(prev.previousElementSibling.value, prev.value, null);
                                             main.cookieEditor("#SP_PLUS_SETAREA");
                                         });
@@ -2208,7 +2215,7 @@
                                         }
                                         if (delCount > 0) {
                                             var con = main.declOfNum(delCount, ["я", "я", "ей"]);
-                                            main.confirmm("Вы действительно хотите удалить " + delCount + " читател" + con + "?", warn = true, function() {
+                                            main.confirmm("Вы действительно хотите удалить " + delCount + " читател" + con + "?", 0, function() {
                                                 var intr = setInterval(function() {
                                                     main.alert("Процесс...<div class='pad_t_a'></div><small>Удаляем читателей <span class='ico ico_spinner'></span></small>", 0, null);
                                                     delCount--;
@@ -2426,9 +2433,10 @@
                 } else {
                     Main = main.ce("div", {
                         class: "sticker",
+                        style: "-webkit-animation: create 0.3s; animation: create 0.3s;",
                         id: "SP_PLUS_CONFIRM"
                     });
-                    if (warn) {
+                    if (!warn) {
                         Container.appendChild(Warning);
                     }
                     Container.appendChild(Br);
@@ -2441,7 +2449,8 @@
             },
             alert: function(html, close, timer) {
                 var Container = main.ce("div", {
-                    class: "sticker w400"
+                    class: "sticker w400",
+                    style: "-webkit-animation: create 0.3s; animation: create 0.3s;"
                 });
                 var Main = main.qs("#SP_PLUS_ALERT");
                 if (Main) {
@@ -2450,7 +2459,7 @@
                     Main = main.ce("div", {
                         class: "content-item3 wbg oh",
                         id: "SP_PLUS_ALERT",
-                        html: (close ? '<img src="' + _PROTOCOL + '//spac.me/i/remove.png" alt="" class="pointer right notif_close" onclick="document.body.removeChild(this.parentNode.parentNode);" title="Закрыть" />' : '') + html
+                        html: (close ? '<img src="' + _PROTOCOL + '//spac.me/i/remove.png" class="pointer right notif_close close_h" onclick="document.body.removeChild(this.parentNode.parentNode);" title="Закрыть" />' : '') + html
                     });
                     Container.appendChild(Main);
                     document.body.appendChild(Container);
@@ -2564,7 +2573,7 @@
                                         }
                                         if (delCount > 0) {
                                             var con = main.declOfNum(delCount, ["й", "я", "ев"]);
-                                            main.confirmm("Вы действительно хотите удалить " + delCount + " комментари" + con + "?", warn = true, function() {
+                                            main.confirmm("Вы действительно хотите удалить " + delCount + " комментари" + con + "?", 0, function() {
                                                 var intr = setInterval(function() {
                                                     main.alert("Процесс...<div class='pad_t_a'></div><small>Удаляем комментарии <span class='ico ico_spinner'></span></small>", 0, null);
                                                     delCount--;
@@ -2580,6 +2589,7 @@
 
                                                     if (delCount < 1) {
                                                         clearInterval(intr);
+                                                        document.location.reload();
                                                     }
                                                 }, 500);
                                             });
@@ -2789,13 +2799,13 @@
                 }
             },
             setStyle: function() {
-                var rev = main.service(1) || "777";
+                var rev = main.service(1);
                 var parent = document.getElementsByTagName('head').item(0);
                 var stl = main.qs("#SP_PLUS_INJSTYLE") || main.ce("style", {
                     id: "SP_PLUS_INJSTYLE",
                     type: "text/css"
                 });
-                stl.innerHTML = "@media (min-width: 1024px){.w400{max-width: 400px;}}#main_shadow, #top_info_block{border-left:unset}.border{border:1px solid #b4bed1}#check_point_full_info{background:#4d5961;box-shadow: 0 3px 5px #293238}.tree_element:hover > .ns, #debug .check_point:hover{background:#818f99}#debug{border:unset;background:#4d5961;}.disabled{cursor:not-allowed;}div.row4{color:#000}input[type=range]{background:transparent;height:0;-webkit-appearance:none;margin:10px 0;width:100%}input[type=range]:focus{outline:0}input[type=range]::-webkit-slider-runnable-track{width:100%;height:10px;cursor:pointer;animate:.2s;background:#395387;border-radius:32px;border:0 solid #000}input[type=range]::-webkit-slider-thumb{border:0 solid #2497E3;height:10px;width:10px;border-radius:4px;background:#395387;cursor:pointer;-webkit-appearance:none;margin-top:0}input[type=range]:focus::-webkit-slider-runnable-track{background:#D2E3F4}input[type=range]::-moz-range-track{-webkit-box-shadow:inset 0 1px 2px #7690c7;-moz-box-shadow:inset 0 1px 2px #7690c7;box-shadow:inset 0 1px 2px #7690c7;width:100%;height:10px;cursor:pointer;animate:.2s;background:#D2E3F4;border-radius:32px;border:0 solid #000}input[type=range]::-moz-range-thumb{border:0 solid #2497E3;height:10px;width:10px;border-radius:4px;background:#395387;cursor:pointer}input[type=range]::-ms-track{width:100%;height:10px;cursor:pointer;animate:.2s;background:0 0;border-color:transparent;color:transparent}input[type=range]::-ms-fill-lower{background:#D2E3F4;border:0 solid #000;border-radius:64px}input[type=range]::-ms-fill-upper{background:#D2E3F4;border:0 solid #000;border-radius:64px}input[type=range]::-ms-thumb{margin-top:1px;border:0 solid #2497E3;height:10px;width:10px;border-radius:4px;background:#395387;cursor:pointer}input[type=range]:focus::-ms-fill-lower{background:#D2E3F4}input[type=range]:focus::-ms-fill-upper{background:#D2E3F4}input[type=range]::-moz-range-progress{border-radius:4px;height:10px;background-color:#395387}input[type=range]::-ms-fill-lower{border-radius:4px;height:10px;background-color:#395387}.brdtop{border-top:1px solid #c5d3e1}#SP_PLUS_SETAREA{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none}details summary:hover{cursor:pointer}.sp_plus_alert_y{border:1px solid #cdd4e1;border-radius:5px;color:#7a90a0;display:block;font-family:sans-serif;font-weight:700;height:auto;padding:17px;position:fixed;text-align:center;margin-left:-156px;top:10%;left:50%;max-height:80%;width:275px;z-index:99999;background:#fff;-webkit-box-shadow:0 3px 5px rgba(93,109,157,.3);-moz-box-shadow:0 3px 5px rgba(93,109,157,.3);box-shadow:0 3px 5px rgba(93,109,157,.3)}.null{display:none!important}.sp_plus_alertg,.sp_plus_small{background-color:#ddebf7}.sp_plus_small{margin:2px;color:#000;display:block;padding:3px;border-radius:2px}.sp_plus_small img{height:auto!important}.sp_plus_a{text-decoration:none!important;border-bottom:1px dashed}.sp_plus_alertr{background-color:#f9e1d9;color:#ff6837}.sp_plus_alertg,.sp_plus_alertr{background-clip:border-box;background-image:none;background-origin:padding-box;box-shadow:rgba(57,83,135,.3) 0 3px 5px 0;display:block;padding:10px;position:relative;font-size:13px}.ico_history_black,a:hover .ico_history_blue,a:active .ico_history{background-position:-306px -54px}.sp_plus_ico_alert,.sp_plus_ico_del,.sp_plus_ico_info,.sp_plus_ico_okb,.sp_plus_ico_fav_off,.sp_plus_ico_fav_on{background-color:transparent;background-image:url(" + _PROTOCOL + "//spac.me/i/ico.png?r=" + rev + ");cursor:pointer;display:inline-block;height:16px;margin-bottom:2px;margin-right:4px;vertical-align:middle;text-align:center;width:16px}.sp_plus_ico_del{background-position:-198px -256px}.sp_plus_ico_okb{background-position:-122px -198px}.sp_plus_ico_alert{background-position:-108px -364px;cursor:default}.sp_plus_ico_info{background-position:-142px -52px;cursor:default}.sp_plus_ico_fav_off{background-position:-216px -256px}.sp_plus_ico_fav_on{background-position:-252px -256px}.sp_plus_button{cursor:pointer;background:#fff}.sp_plus_button:hover{background:#ecf5fd}.sp_plus_checkbox+label,.sp_plus_checkbox_el+label,.sp_plus_checkbox_radio+label{position:relative;overflow:hidden;cursor:pointer;text-decoration:none!important}.sp_plus_checkbox+label{margin-left:5px;padding:0 4px;vertical-align:top;width:16px;height:16px;display:inline-block}.sp_plus_checkbox_el+label,.sp_plus_checkbox_radio+label{padding:12px 5px 12px 25px}.sp_plus_checkbox+label:before,.sp_plus_checkbox_el+label:before{position:absolute;display:inline-block;content:'';background-position:-72px -220px;width:16px;height:16px;background-color:transparent;background-image:url(" + _PROTOCOL + "//spac.me/i/ico.png?r=" + rev + ")}.sp_plus_checkbox+label:before,.sp_plus_checkbox_radio+label:before{position:absolute;display:inline-block;content:'';background-position:-252px -36px;width:16px;height:16px;background-color:transparent;background-image:url(" + _PROTOCOL + "//spac.me/i/ico.png?r=" + rev + ")}.sp_plus_checkbox_el+label:before{left:3px;top:12px}.sp_plus_checkbox_radio+label:before{left:3px;top:12px}.sp_plus_checkbox+label:before{top:8px;margin-top:-8px}.sp_plus_checkbox:checked+label:before,.sp_plus_checkbox_el:checked+label:before,.sp_plus_checkbox_radio:checked+label:before{background-position:-252px -108px}.sp_plus_checkbox,.sp_plus_checkbox_el,.sp_plus_checkbox_radio{position:absolute;left:-10000px}.sp_plus_line>span{background:#fff;padding:0 5px;position:relative;margin:0 10px;display:inline-block}.sp_plus_line:before{content:'';display:block;border-bottom:1px solid #cdd4e1;left:0;right:0;top:50%;position:absolute}.sp_plus_line{text-align:center;position:relative;font-weight:700}.sp_plus_text{color:#395387}.sp_plus_liness{border-top:1px solid #344047!important}.bstrwrap{border-bottom:unset!important;border-top:1px solid #cdd4e1}.ico_demo{background-position:-414px -130px}input[type='color']{opacity:0;cursor:pointer}.sp_btn_line{border-right:1px solid #cdd4e1}.ico_backup{display:inline-block;background:url(data:image/png;base64,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) no-repeat;width:16px;height:16px;margin:0 4px -3px 0}.sp_plus_ico_ref{display:inline-block;background:url(data:image/png;base64,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)no-repeat;width:16px;height:16px;margin:0 4px -3px 0}";
+                stl.innerHTML = ".sp_plus_line_c:before{content:'';display:block;border-bottom:1px solid #cdd4e1;left:48px;right:80px;top:50%;position:absolute}.sp_plus_line_c{position:relative;}ul>li{margin: 10px;}.close_h:hover{opacity: 0.8;}@media (min-width: 1024px){.w400{max-width: 400px;}}#main_shadow, #top_info_block{border-left:unset}.border{border:1px solid #b4bed1}#check_point_full_info{background:#4d5961;box-shadow: 0 3px 5px #293238}.tree_element:hover > .ns, #debug .check_point:hover{background:#818f99}#debug{border:unset;background:#4d5961;}.disabled{cursor:not-allowed;}div.row4{color:#000}input[type=range]{background:transparent;height:0;-webkit-appearance:none;margin:10px 0;width:100%}input[type=range]:focus{outline:0}input[type=range]::-webkit-slider-runnable-track{width:100%;height:10px;cursor:pointer;animate:.2s;background:#395387;border-radius:32px;border:0 solid #000}input[type=range]::-webkit-slider-thumb{border:0 solid #2497E3;height:10px;width:10px;border-radius:4px;background:#395387;cursor:pointer;-webkit-appearance:none;margin-top:0}input[type=range]:focus::-webkit-slider-runnable-track{background:#D2E3F4}input[type=range]::-moz-range-track{-webkit-box-shadow:inset 0 1px 2px #7690c7;-moz-box-shadow:inset 0 1px 2px #7690c7;box-shadow:inset 0 1px 2px #7690c7;width:100%;height:10px;cursor:pointer;animate:.2s;background:#D2E3F4;border-radius:32px;border:0 solid #000}input[type=range]::-moz-range-thumb{border:0 solid #2497E3;height:10px;width:10px;border-radius:4px;background:#395387;cursor:pointer}input[type=range]::-ms-track{width:100%;height:10px;cursor:pointer;animate:.2s;background:0 0;border-color:transparent;color:transparent}input[type=range]::-ms-fill-lower{background:#D2E3F4;border:0 solid #000;border-radius:64px}input[type=range]::-ms-fill-upper{background:#D2E3F4;border:0 solid #000;border-radius:64px}input[type=range]::-ms-thumb{margin-top:1px;border:0 solid #2497E3;height:10px;width:10px;border-radius:4px;background:#395387;cursor:pointer}input[type=range]:focus::-ms-fill-lower{background:#D2E3F4}input[type=range]:focus::-ms-fill-upper{background:#D2E3F4}input[type=range]::-moz-range-progress{border-radius:4px;height:10px;background-color:#395387}input[type=range]::-ms-fill-lower{border-radius:4px;height:10px;background-color:#395387}.brdtop{border-top:1px solid #c5d3e1}#SP_PLUS_SETAREA{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none}details summary:hover{cursor:pointer}.sp_plus_alert_y{border:1px solid #cdd4e1;border-radius:5px;color:#7a90a0;display:block;font-family:sans-serif;font-weight:700;height:auto;padding:17px;position:fixed;text-align:center;margin-left:-156px;top:10%;left:50%;max-height:80%;width:275px;z-index:99999;background:#fff;-webkit-box-shadow:0 3px 5px rgba(93,109,157,.3);-moz-box-shadow:0 3px 5px rgba(93,109,157,.3);box-shadow:0 3px 5px rgba(93,109,157,.3)}.null{display:none!important}.sp_plus_alertg,.sp_plus_small{background-color:#ddebf7}.sp_plus_small{margin:2px;color:#000;display:block;padding:3px;border-radius:2px}.sp_plus_small img{height:auto!important}.sp_plus_a{text-decoration:none!important;border-bottom:1px dashed}.sp_plus_alertr{background-color:#f9e1d9;color:#ff6837}.sp_plus_alertg,.sp_plus_alertr{background-clip:border-box;background-image:none;background-origin:padding-box;box-shadow:rgba(57,83,135,.3) 0 3px 5px 0;display:block;padding:10px;position:relative;font-size:13px}.ico_history_black,a:hover .ico_history_blue,a:active .ico_history{background-position:-306px -54px}.sp_plus_ico_alert,.sp_plus_ico_del,.sp_plus_ico_info,.sp_plus_ico_okb,.sp_plus_ico_fav_off,.sp_plus_ico_fav_on{background-color:transparent;background-image:url(" + _PROTOCOL + "//spac.me/i/ico.png?r=" + rev + ");cursor:pointer;display:inline-block;height:16px;margin-bottom:2px;margin-right:4px;vertical-align:middle;text-align:center;width:16px}.sp_plus_ico_del{background-position:-198px -256px}.sp_plus_ico_okb{background-position:-122px -198px}.sp_plus_ico_alert{background-position:-108px -364px;cursor:default}.sp_plus_ico_info{background-position:-142px -52px;cursor:default}.sp_plus_ico_fav_off{background-position:-216px -256px}.sp_plus_ico_fav_on{background-position:-252px -256px}.sp_plus_button{cursor:pointer;background:#fff}.sp_plus_button:hover{background:#ecf5fd}.sp_plus_checkbox+label,.sp_plus_checkbox_el+label,.sp_plus_checkbox_radio+label{position:relative;overflow:hidden;cursor:pointer;text-decoration:none!important}.sp_plus_checkbox+label{margin-left:5px;padding:0 4px;vertical-align:top;width:16px;height:16px;display:inline-block}.sp_plus_checkbox_el+label,.sp_plus_checkbox_radio+label{padding:12px 5px 12px 25px}.sp_plus_checkbox+label:before,.sp_plus_checkbox_el+label:before{position:absolute;display:inline-block;content:'';background-position:-72px -220px;width:16px;height:16px;background-color:transparent;background-image:url(" + _PROTOCOL + "//spac.me/i/ico.png?r=" + rev + ")}.sp_plus_checkbox+label:before,.sp_plus_checkbox_radio+label:before{position:absolute;display:inline-block;content:'';background-position:-252px -36px;width:16px;height:16px;background-color:transparent;background-image:url(" + _PROTOCOL + "//spac.me/i/ico.png?r=" + rev + ")}.sp_plus_checkbox_el+label:before{left:3px;top:12px}.sp_plus_checkbox_radio+label:before{left:3px;top:12px}.sp_plus_checkbox+label:before{top:8px;margin-top:-8px}.sp_plus_checkbox:checked+label:before,.sp_plus_checkbox_el:checked+label:before,.sp_plus_checkbox_radio:checked+label:before{background-position:-252px -108px}.sp_plus_checkbox,.sp_plus_checkbox_el,.sp_plus_checkbox_radio{position:absolute;left:-10000px}.sp_plus_line>span{background:#fff;padding:0 5px;position:relative;margin:0 10px;display:inline-block}.sp_plus_line:before{content:'';display:block;border-bottom:1px solid #cdd4e1;left:0;right:0;top:50%;position:absolute}.sp_plus_line{text-align:center;position:relative;font-weight:700}.sp_plus_text{color:#395387}.sp_plus_liness{border-top:1px solid #344047!important}.bstrwrap{border-bottom:unset!important;border-top:1px solid #cdd4e1}.ico_demo{background-position:-414px -130px}input[type='color']{opacity:0;cursor:pointer}.sp_btn_line{border-right:1px solid #cdd4e1}.ico_backup{display:inline-block;background:url(data:image/png;base64,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) no-repeat;width:16px;height:16px;margin:0 4px -3px 0}.sp_plus_ico_ref{display:inline-block;background:url(data:image/png;base64,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)no-repeat;width:16px;height:16px;margin:0 4px -3px 0}";
                 if (_SETTINGS.bodystyle) {
                     if (_SETTINGS.bodystyleSetting.url && _SETTINGS.bodystyleSetting.urlchecked) stl.innerHTML += 'body,#main_wrap{background-image:url(' + _SETTINGS.bodystyleSetting.url + ')}';
                     if (_SETTINGS.bodystyleSetting.color && _SETTINGS.bodystyleSetting.colorchecked) stl.innerHTML += 'body,#main_wrap{background-color:' + _SETTINGS.bodystyleSetting.color + '}';
@@ -2822,7 +2832,7 @@
                                 mailBox = 'margin-top: 10px;'
                                 break;
                         }
-                        stl.innerHTML += '.mailBox{border-radius:2px; border:1px solid #cdd4e1; background:#fff; box-shadow:0 0 10px rgba(0,0,0,0.5); text-decoration:none !important; display:block; width:280px; height:auto; ' + mailBox + ' -webkit-animation: create 2s; animation: create ' + _SETTINGS.msgAlertSettings.animDelay + 's} .mailContainer {z-index: 99999; position: fixed; ' + mailContainer + ' padding: 10px} .mailBox .data {display: inline-block; position: absolute; padding-top: 5px;} .mailBox .avatar {width: 64px; padding-right: 5px; border-radius:2px; margin-bottom: -3px;} .text>img {display: inline-block;}.text>div.image_limit {width: 28px; display: inline-block;} .mailBox .name {line-height: 20px; font-weight: bold;} .mailBox .text {white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: #323232; width: 195px; font-size: small;} @-webkit-keyframes create {0% {opacity: 0;} 100% {opacity: 1;}} @-webkit-keyframes destroy {0% {opacity: 1;} 100% {opacity: 0;}}}'
+                        stl.innerHTML += '.mailBox{background:#fff; box-shadow: 0 0 5px rgba(93,109,157,.3); text-decoration:none !important; display:block; width:280px; height:auto; ' + mailBox + ' -webkit-animation: create 0.' + _SETTINGS.msgAlertSettings.animDelay + 's; animation: create 0.' + _SETTINGS.msgAlertSettings.animDelay + 's} .mailContainer {z-index: 99999; position: fixed; ' + mailContainer + ' padding: 10px} .mailBox .data {display: inline-block; position: absolute; padding-top: 5px;} .mailBox .avatar {width: 64px; padding-right: 5px; border-radius:2px; margin-bottom: -3px;} .text>img {display: inline-block;}.text>div.image_limit {width: 28px; display: inline-block;} .mailBox .name {line-height: 20px; font-weight: bold;} .mailBox .text {white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: #323232; width: 195px; font-size: small;} @-webkit-keyframes create {0% {opacity: 0;} 100% {opacity: 1;}} @-webkit-keyframes destroy {0% {opacity: 1;} 100% {opacity: 0;}}}'
                     }
                     parent.appendChild(stl);
                 }
@@ -2830,6 +2840,7 @@
             backup: function(id) {
                 window.scrollTo(0, 0);
                 var target = main.qs(id);
+                this.console.log(target)
                 if (target) {
                     try {
                         target.innerHTML = "";
@@ -2837,10 +2848,43 @@
                         var wrap = main.ce("div", {
                             class: "content-bl"
                         });
+                        if (!_SETTINGS.hideNotyf.configImport) {
+                            var hideNotyf = main.ce("img", {
+                                class: "p16 m pointer right close_h",
+                                style: "padding: 10px;",
+                                src: _PROTOCOL + "//spac.me/i/remove.png",
+                                title: "Понятно, больше не показывать.",
+                                onclick: function() {
+                                    _SETTINGS.hideNotyf.configImport = true;
+                                    var jsonSet = JSON.stringify(_SETTINGS);
+                                    main.setCookie("SP_PLUS_SET", jsonSet, null);
+                                    main.remove(main.qs("#SP_CONFIG_JSON"));
+                                }
+                            });
+                            var smallInfo = main.ce("div", {
+                                class: "stnd-block-yellow",
+                                style: "padding: 15px;",
+                                html: '<span class="ico ico_alert"></span>Внимание!</br></br><div style="font-size: small;">Редактирование только для опытных пользователей, если что-то пошло не так, следует сделать полный сброс настроек.</div>'
+                            });
+                            var infoDiv = main.ce("div", {
+                                id: "SP_CONFIG_JSON"
+                            });
+                            infoDiv.appendChild(hideNotyf);
+                            target.appendChild(infoDiv);
+                            infoDiv.appendChild(smallInfo);
+                        }
+                        var preloader = main.ce("div", {
+                            class: "t_center",
+                            id: "SP_JSON_PRELOADER",
+                            html: "<img src='https://beta.spac.me/i/preloader.gif'>"
+                        });
+                        target.appendChild(wrap);
+                        wrap.appendChild(preloader);
                         var tiw = main.ce("div", {
                             class: "text-input__wrap"
                         });
                         var err = main.ce("div", {
+                            id: "JSON_ERROR_BLOCK",
                             class: "stnd-block-yellow",
                             style: "padding: 15px;",
                             html: '<span class="ico ico_alert"></span> Invalid JSON!<br /><br />'
@@ -2855,9 +2899,9 @@
                         var delSubm = main.ce("button", {
                             class: "user__tools-link table__cell sp_btn_line",
                             style: "width: 50%; display: inline-block; box-sizing: border-box;",
-                            html: '<span class="sp_plus_ico_ref"></span><span style="color: #3ca93c;">Восстановить</span>',
+                            html: '<span class="sp_plus_ico_ref"></span><span style="color: #3ca93c;">Сбросить</span>',
                             onclick: function() {
-                                main.confirmm("Восстановить файл конфигурации?", function() {
+                                main.confirmm("Сбросить файл конфигурации?", 0, function() {
                                     main.delCookie("SP_PLUS_SET");
                                     document.location.reload();
                                 });
@@ -2865,16 +2909,46 @@
                             }
                         });
                         var chSubm = main.ce("button", {
-                            class: "user__tools-link table__cell",
+                            class: "user__tools-link",
                             style: "width: 50%; display: inline-block; box-sizing: border-box;",
                             html: '<span class="sp_plus_ico_okb"></span><span style="color: #57A3EA;">Сохранить</span>',
                             onclick: function() {
-                                main.setCookie("SP_PLUS_SET", textarea.value, null);
-                                document.location.reload();
+                                var params = 'value=' + textarea.value
+                                main.ajax("https://crashmax.ru/api/getJSON", "POST", params, function(r) {
+                                    if (r) {
+                                        var _json = {
+                                            'result': {
+                                                'valid': 0,
+                                                'jsoncopy': "",
+                                                'errors': {
+                                                    'code': 0,
+                                                    'message': "",
+                                                    'element': 0
+                                                }
+                                            }
+                                        };
+                                        var json = main.extend(_json, JSON.parse(r));
+                                        if (json.result.valid == 1) {
+                                            main.setCookie("SP_PLUS_SET", textarea.value, null);
+                                            document.location.reload();
+                                            var jsonerr = main.qs("#JSON_ERROR_BLOCK");
+                                            if (jsonerr) main.remove(jsonerr);
+                                        } else {
+                                            target.appendChild(err);
+                                            for (var i = 0; i < json.result.errors.length; i++) {
+                                                var error = main.ce("div", {
+                                                    style: "padding-left: 30px; font-size: small;",
+                                                    html: '<b>Error:</b> ' + json.result.errors[i].message + ' [Code: ' + json.result.errors[i].code + ', Sctructure: ' + json.result.errors[i].element + ']<br />'
+                                                })
+                                                err.appendChild(error);
+                                            }
+                                        }
+                                    }
+                                });
                                 return false;
                             }
                         });
-                        params = 'value=' + JSON.stringify(_SETTINGS)
+                        var params = 'value=' + JSON.stringify(_SETTINGS)
                         main.ajax("https://crashmax.ru/api/getJSON", "POST", params, function(r) {
                             if (r) {
                                 var _json = {
@@ -2893,7 +2967,7 @@
                                     class: "text-input",
                                     id: "SP_BACKUP_JSON",
                                     cols: "17",
-                                    rows: "49",
+                                    rows: "50",
                                     html: json.result.jsoncopy
                                 });
                                 if (json.result.valid == 1) {
@@ -2901,6 +2975,8 @@
                                     wrap.appendChild(tiw);
                                     tiw.appendChild(cl);
                                     cl.appendChild(textarea);
+                                    var tloader = main.qs("#SP_JSON_PRELOADER");
+                                    main.remove(tloader);
                                 } else {
                                     target.appendChild(err);
                                     for (var i = 0; i < json.result.errors.length; i++) {
@@ -2916,7 +2992,7 @@
                                 cl.appendChild(textarea);
                                 btnDiv.appendChild(delSubm);
                                 btnDiv.appendChild(chSubm);
-                                main.inBefore(btnDiv, main.qs("#SP_PLUS_SETBACK"));
+                                main.inBefore(btnDiv, main.qs("#SP_PLUS_ABOUT"));
                             }
                         });
                     } catch (e) {
@@ -2931,25 +3007,27 @@
                     try {
                         target.innerHTML = "";
                         var wrap = main.ce("div", {
-                            class: "content-bl"
-                        })
-                        var build = main.ce("span", {
-                            style: "font-size:small"
-                        })
-                        var changes = main.ce("div", {
-                            style: "padding-left: 30px; font-size: small;"
-                        })
+                            class: "wbg error__item_wrapper",
+                            style: "padding: 5px 15px 5px 16px; display: block;"
+                        });
+                        var div = main.ce("div", {
+                            class: "pad_t_a"
+                        });
+                        var container = main.ce("div", {
+                            class: "js-input_error_wrap"
+                        });
+                        var preloader = main.ce("div", {
+                            class: "t_center",
+                            id: "SP_JSON_PRELOADER",
+                            html: "<img src='https://beta.spac.me/i/preloader.gif'>"
+                        });
+                        container.appendChild(div);
+                        wrap.appendChild(container);
                         target.appendChild(wrap);
-                        wrap.appendChild(build);
-                        wrap.appendChild(changes);
-                        main.ajax('https://' + gitPages + "/updater.json", "GET", null, function(r) {
+                        wrap.appendChild(preloader);
+                        main.ajax("https://" + gitPages + "/updater.json?r=" + main.service(1), "GET", null, function(r) {
                             if (r) {
                                 var _json = {
-                                    'latest': {
-                                        'build': 0,
-                                        'date': "",
-                                        'changes': ""
-                                    },
                                     'history': {
                                         'build': 0,
                                         'date': "",
@@ -2957,20 +3035,20 @@
                                     }
                                 };
                                 var json = main.extend(_json, JSON.parse(r));
+                                var tloader = main.qs("#SP_JSON_PRELOADER");
+                                main.remove(tloader);
                                 for (var i = 0; i < json.history.length; i++) {
-                                    build.innerHTML = '<b>Сборка ' + main.rever(json.latest.build) + ' - (' + json.latest.date + ')</b><br />'
-                                    changes.innerHTML = json.latest.changes;
-
-                                    var divBld = document.createElement('span');
-                                    var divChg = document.createElement('div');
-                                    divBld.style = "font-size: small;";
-                                    divChg.style = "padding-left: 30px; font-size: small;";
-
-                                    divBld.innerHTML = '<b>Сборка ' + main.rever(json.history[i].build) + ' - (' + json.history[i].date + ')</b><br />';
-                                    divChg.innerHTML = json.history[i].changes;
-
-                                    wrap.appendChild(divBld);
-                                    wrap.appendChild(divChg);
+                                    var label = main.ce("label", {
+                                        class: "label sp_plus_line_c",
+                                        html: 'v' + main.rever(json.history[i].build) + '<div class="label__desc">' + json.history[i].date + '</div>'
+                                    });
+                                    var changes = main.ce("div", {
+                                        class: "grey",
+                                        style: "font-size: small; margin-left: 3rem;",
+                                        html: json.history[i].changes
+                                    });
+                                    div.appendChild(label);
+                                    div.appendChild(changes);
                                 }
                             }
                         });
@@ -2980,27 +3058,28 @@
                 }
             },
             update: function() {
-                main.ajax("https://" + gitPages + "/updater.json", "GET", null, function(r) {
+                main.ajax("https://" + gitPages + "/updater.json?r=" + main.service(1), "GET", null, function(r) {
                     if (r) {
                         var _json = {
-                            'latest': {
+                            'history': {
                                 'build': 0,
+                                'date': "",
                                 'changes': ""
                             }
                         };
                         var json = main.extend(_json, JSON.parse(r));
                         var hideVer = 0;
-                        if (_SETTINGS.hideUp) hideVer = parseInt(_SETTINGS.hideUp, 10);
+                        if (_SETTINGS.upVersion) hideVer = parseInt(_SETTINGS.upVersion, 10);
                         BUILD = Math.max(hideVer, BUILD);
-                        if (json.latest.build > BUILD) {
-                            main.alert('Доступна новая версия Spaces+ <sup>' + main.rever(json.latest.build) + '</sup><div class="pad_t_a"></div><small>' + json.latest.changes + '</small><div id="SP_UPDATER_BUTTONS" class="pad_t_a"><a class="btn btn_green btn_input" href="http://' + gitPages + '/spaces_plus.user.js" onclick="document.body.removeChild(this.parentNode.parentNode.parentNode); return true;"> Обновить</a></div>', 1, 1);
+                        if (json.history[0].build > BUILD) {
+                            main.alert('Доступна новая версия Spaces+ <sup>' + main.rever(json.history[0].build) + '</sup><div class="pad_t_a"></div><small class="grey">' + json.history[0].changes + '</small><div id="SP_UPDATER_BUTTONS" class="pad_t_a"><a class="btn btn_green btn_input" href="http://' + gitPages + '/spaces_plus.user.js?r=' + main.service(1) + '" onclick="document.body.removeChild(this.parentNode.parentNode.parentNode); return true;"> Обновить</a></div>', 1, 1);
                             if (main.qs("#SP_PLUS_ALERT")) {
                                 var hide = main.ce("a", {
                                     href: "#",
                                     class: "btn btn_white btn_input right sticker-close_btn",
                                     html: "Больше не показывать",
                                     onclick: function(e) {
-                                        _SETTINGS['hideUp'] = json.latest.build;
+                                        _SETTINGS['upVersion'] = json.history[0].build;
                                         var jsonSet = JSON.stringify(_SETTINGS);
                                         main.setCookie("SP_PLUS_SET", jsonSet, null);
                                         document.body.removeChild(e.target.parentNode.parentNode.parentNode);
@@ -3016,7 +3095,7 @@
             msgAlertSettings: function(e) {
                 var masWarp = main.ce("div", {
                     id: "SP_PLUS_MSGALERTSETTINGS",
-                    style: "padding: 11px 15px; border-bottom: unset;"
+                    style: "padding: 11px 15px;"
                 });
                 var mAlert = main.ce("input", {
                     type: "text",
@@ -3084,7 +3163,7 @@
                     }
                 };
                 var animTimeLbl = main.ce("label", {
-                    html: 'Время появления и исчезания сообщения:<div class="label__desc">от 1 до 5</div>',
+                    html: 'Время появления и исчезания сообщения:<div class="label__desc">от 1 до 9</div>',
                     class: "label"
                 });
                 masWarp.appendChild(mAlertLbl);
@@ -3110,7 +3189,7 @@
                         var messageKey = Object.keys(res.messages)[0]
                         if (data.data.contact.user != undefined) {
                             if (res.messages[messageKey].contact.avatar == null) {
-                                main.jajax(_PROTOCOL + '//' + _DOMAIN + '/mysite/?name=' + data.data.contact.user, function(j) {
+                                main.jajax(_PROTOCOL + '//' + _DOMAIN + '/mysite/index/' + data.data.contact.user + '/', function(j) {
                                     var j = JSON.parse(j)
                                     avatar = j.owner_widget.photo_widget.previewURL
                                 })
@@ -3119,10 +3198,11 @@
                             }
                             name = data.data.contact.user
                         } else {
-                            avatar = "https://" + gitPages + "/src/spaces/talk.jpg"
                             if (res.messages[messageKey].subject) {
+                                avatar = "https://" + gitPages + "/src/attaches/ico/email.png"
                                 name = res.messages[messageKey].contact.name
                             } else {
+                                avatar = "https://" + gitPages + "/src/attaches/ico/groups_chat.png"
                                 name = res.messages[messageKey].contact.widget.siteLink.user_name + ' [' + res.messages[messageKey].contact.name + ']'
                             }
                         }
@@ -3174,7 +3254,7 @@
                                 var hide = main.ce("img", {
                                     src: _PROTOCOL + '//spac.me/i/remove.png',
                                     style: "padding: 5px;",
-                                    class: "right notif_close",
+                                    class: "right notif_close close_h",
                                     onclick: function() {
                                         if (!isClosed) {
                                             clearTimeout(del)
@@ -3251,7 +3331,7 @@
                     }
                 }
             },
-            freeSticker: function(checked) {
+            freeSticker: function() {
                 var script = main.qs("#SP_PLUS_STICKER");
                 if (script) {
                     document.getElementsByTagName('head')[0].removeChild(script);
