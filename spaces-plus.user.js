@@ -3072,7 +3072,7 @@
                         if (_SETTINGS.upVersion) hideVer = parseInt(_SETTINGS.upVersion, 10);
                         BUILD = Math.max(hideVer, BUILD);
                         if (json.history[0].build > BUILD) {
-                            main.alert('Доступна новая версия Spaces+ <sup>' + main.rever(json.history[0].build) + '</sup><div class="pad_t_a"></div><small class="grey">' + json.history[0].changes + '</small><div id="SP_UPDATER_BUTTONS" class="pad_t_a"><a class="btn btn_green btn_input" href="http://' + gitPages + '/spaces_plus.user.js?r=' + main.service(1) + '" onclick="document.body.removeChild(this.parentNode.parentNode.parentNode); return true;"> Обновить</a></div>', 1, 1);
+                            main.alert('Доступна новая версия Spaces+ <sup>' + main.rever(json.history[0].build) + '</sup><div class="pad_t_a"></div><small class="grey">' + json.history[0].changes + '</small><div id="SP_UPDATER_BUTTONS" class="pad_t_a"><a class="btn btn_green btn_input" href="http://' + gitPages + '/spaces-plus.user.js?r=' + main.service(1) + '" onclick="document.body.removeChild(this.parentNode.parentNode.parentNode); return true;"> Обновить</a></div>', 1, 1);
                             if (main.qs("#SP_PLUS_ALERT")) {
                                 var hide = main.ce("a", {
                                     href: "#",
