@@ -1,26 +1,22 @@
-## Spaces Plus v2.0
+# Spaces+
 
-- Скрипт предназначен для расширения функционала [Spaces.ru](http://spaces.ru) общедоступными способами!
+![GitHub last commit](https://img.shields.io/github/last-commit/spaces-dev/spaces-dev.github.io?style=flat-square)
+[![HitCount](https://hits.dwyl.com/spaces-dev/spaces-dev.github.io.svg)](https://hits.dwyl.com/spaces-dev/spaces-dev.github.io)
+![Website](https://img.shields.io/website?down_message=down&label=spaces.ru&style=flat-square&up_message=online&url=https%3A%2F%2Fspaces.ru)
+![Website](https://img.shields.io/website?down_message=down&label=spaces.im&style=flat-square&up_message=online&url=https%3A%2F%2Fspaces.im)
+![Website](https://img.shields.io/website?down_message=down&label=spac.me&style=flat-square&up_message=online&url=https%3A%2F%2Fspac.me)
+![Website](https://img.shields.io/website?down_message=down&label=spcs.me&style=flat-square&up_message=online&url=https%3A%2F%2Fspcs.me)
+![Website](https://img.shields.io/website?down_message=down&label=gdespaces.com&style=flat-square&up_message=online&url=https%3A%2F%2Fgdespaces.com)
+[![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?style=flat-square)](https://github.com/spaces-dev/spaces-dev.github.io/blob/master/LICENSE)
 
-## Install
+## Installation
 
-Для работы скрипта необходимо установить расширение для вашего браузера:
-
-- [Google Chrome](https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo)
-
-- [Mozilla Firefox](https://addons.mozilla.org/ru/firefox/addon/greasemonkey/)
-
-- [Microsoft Edge](https://www.microsoft.com/store/p/tampermonkey/9nblggh5162s)
-
-- [Safari](http://tampermonkey.net/?browser=safari)
-
-- [Opera](https://addons.opera.com/ru/extensions/details/tampermonkey-beta/)
-
-Ccылка на установку: [нажмите, чтобы установить!](https://spaces-dev.github.io/spaces_plus.user.js)
+- [More Info](https://spaces-dev.github.io/)
 
 ## Contacts
 
-- [Официальная группа Spaces+](https://spcs.me/comm/show/?address=Extension "Баги и предложения")
+- [Developer](https://t.me/crashmax)
+- [Telegram chat](https://t.me/spaces_dev "Bugs and discussion")
 
 ## License
 

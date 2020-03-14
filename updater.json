@@ -18,7 +18,7 @@
 		{
 			"build": "215",
 			"date": "21.02.2020",
-			"changes": "<b>\u041A\u043E\u0434:</b></br><ul class='list'><li><a href='https://github.com/spaces-dev/spaces-dev.github.io' target='_blank'>GitHub Pages</a> \u0440\u0435\u043F\u043E\u0437\u0438\u0442\u043E\u0440\u0438\u0439 \u043F\u0435\u0440\u0435\u043D\u0435\u0441\u0435\u043D \u0432 \u043E\u0440\u0433\u0430\u043D\u0438\u0437\u0430\u0446\u0438\u044E <a href='https://github.com/spaces-dev/spaces-dev.github.io' target='_blank'>spaces-dev</a></li></ul>"
+			"changes": "<b>\u041A\u043E\u0434:</b></br><ul class='list'><li><a href='https://github.com/spaces-dev/spaces-dev.github.io' target='_blank'>GitHub Pages</a> \u0440\u0435\u043F\u043E\u0437\u0438\u0442\u043E\u0440\u0438\u0439 \u043F\u0435\u0440\u0435\u043D\u0435\u0441\u0435\u043D \u0432 \u043E\u0440\u0433\u0430\u043D\u0438\u0437\u0430\u0446\u0438\u044E <a href='https://github.com/spaces-dev' target='_blank'>spaces-dev</a></li></ul>"
 		},
 		{
 			"build": "214",
