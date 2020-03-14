@@ -30,8 +30,13 @@
                 border-bottom: 1px solid #cdd4e1;
                 left: 48px;
                 right: 85px;
-                top: 50%;
+                top: 55%;
                 position: absolute;
+            }
+
+            .changelog-item {
+                margin-left: 3rem;
+                color: #495057;
             }
 
             .github-corner:hover .octo-arm {
@@ -83,7 +88,7 @@
                 <p class="card-text mt-4">
                     <ol>
                         <li>
-                            <p>Install the plugin for your browser <code><a href="https://www.tampermonkey.net" target="_blank">Tampermonkey</a></code> or <code><a href="https://www.greasespot.net" target="_blank">Greasemonkey</a></code> and <code><a href="https://violentmonkey.github.io" target="_blank">Violentmonkey</a></code></p>
+                            <p>Install the plugin for your browser <a href="https://www.tampermonkey.net" target="_blank">Tampermonkey</a> or <a href="https://www.greasespot.net" target="_blank">Greasemonkey</a> and <a href="https://violentmonkey.github.io" target="_blank">Violentmonkey</a></p>
                             <ul>
                                 <li><a href="https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo" target="_blank">Google Chrome</a></li>
                                 <li><a href="https://addons.mozilla.org/ru/firefox/addon/greasemonkey/" target="_blank">Mozilla Firefox</a></li>
@@ -129,7 +134,7 @@
     </div>
     <div class="text-center mt-4 mb-4">Created by <a href="https://crashmax.ru" target="_blank">crashmax</a> with <span class="text-danger">♥</span></div>
     <script>
-        function rever(n){return n?n.toString().split("").join("."):n}$.getJSON("updater.json").done(function(n){$(function(){$.each(n.history,function(n,t){$("#changelog-rel").append('<div class="card-block mt-4 col-sm-12"><div class="header-line">v'+rever(t.build)+'<div class="pull-right">'+t.date+"</div></div>"+t.changes+"</div>")})})}),$.getJSON("data.json").done(function(n){$(function(){$.each(n.backgrounds,function(n,t){$("#backgrounds-rel").append('<div class="card-block mt-4 col-sm-2"><img class="card-img-top" src="'+t.url+'"><button type="button" class="clipboard-b btn btn-primary btn-block btn-radius" data-clipboard-text="'+t.url+'">Copy</button></div>')}),$("#bg-badge").append(n.backgrounds.length)}),$(function(){$.each(n.sounds,function(n,t){$("#sounds-rel").append('<div class="card-block mt-4 col-sm-12"><audio src="'+t.url+'" id="'+t.name+'-s" type="'+t.type+'"></audio><div class="input-group"><button class="input-group-addon" onClick="document.getElementById(\''+t.name+'-s\').play()"><i class="fa fa-play"></i></button><input type="text" id="'+t.name+'-c" class="form-control" value="'+t.url+'" readonly><button class="clipboard-s input-group-addon" data-clipboard-target="#'+t.name+'-c"><i class="fa fa-clipboard"></i></button></div></div>')}),$("#sn-badge").append(n.sounds.length)})}),$(function(){new ClipboardJS(".clipboard-b").on("success",function(n){n.clearSelection(),n.trigger.className="clipboard-b btn btn-success btn-block btn-radius",n.trigger.innerHTML="Copied!",window.setTimeout(function(){n.trigger.className="clipboard-b btn btn-primary btn-block btn-radius",n.trigger.innerHTML="Copy"},3e3)})}),$(function(){new ClipboardJS(".clipboard-s").on("success",function(n){n.clearSelection(),n.trigger.innerHTML="Copied!",window.setTimeout(function(){n.trigger.innerHTML='<i class="fa fa-clipboard"></i>'},3e3)})});
+        function rever(n){return n?n.toString().split("").join("."):n}$.getJSON("updater.json").done(function(n){$(function(){$.each(n.history,function(n,t){$("#changelog-rel").append('<div class="card-block mt-4 col-sm-12"><div class="header-line">v'+rever(t.build)+'<div class="pull-right">'+t.date+'</div></div><div class="changelog-item">'+t.changes+"</div></div>")})})}),$.getJSON("data.json").done(function(n){$(function(){$.each(n.backgrounds,function(n,t){$("#backgrounds-rel").append('<div class="card-block mt-4 col-sm-2"><img class="card-img-top" src="'+t.url+'"><button type="button" class="clipboard-b btn btn-primary btn-block btn-radius" data-clipboard-text="'+t.url+'">Copy</button></div>')}),$("#bg-badge").append(n.backgrounds.length)}),$(function(){$.each(n.sounds,function(n,t){$("#sounds-rel").append('<div class="card-block mt-4 col-sm-12"><audio src="'+t.url+'" id="'+t.name+'-s" type="'+t.type+'"></audio><div class="input-group"><button class="input-group-addon" onClick="document.getElementById(\''+t.name+'-s\').play()"><i class="fa fa-play"></i></button><input type="text" id="'+t.name+'-c" class="form-control" value="'+t.url+'" readonly><button class="clipboard-s input-group-addon" data-clipboard-target="#'+t.name+'-c"><i class="fa fa-clipboard"></i></button></div></div>')}),$("#sn-badge").append(n.sounds.length)})}),$(function(){new ClipboardJS(".clipboard-b").on("success",function(n){n.clearSelection(),n.trigger.className="clipboard-b btn btn-success btn-block btn-radius",n.trigger.innerHTML="Copied!",window.setTimeout(function(){n.trigger.className="clipboard-b btn btn-primary btn-block btn-radius",n.trigger.innerHTML="Copy"},3e3)})}),$(function(){new ClipboardJS(".clipboard-s").on("success",function(n){n.clearSelection(),n.trigger.innerHTML="Copied!",window.setTimeout(function(){n.trigger.innerHTML='<i class="fa fa-clipboard"></i>'},3e3)})});
     </script>
 </body>
 </html>
