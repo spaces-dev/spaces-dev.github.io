@@ -1,95 +1,135 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8">
-		<title>Spaces+ :: Backgrounds & Sounds</title>
-		<link rel="icon" href="favicon.png">
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
-		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
-		<style>
-			.card-body {
-				text-align: center;
-			}
-			.col-md-4 {
-				margin-bottom: 2rem;
-			}
-			.nav-tabs {
-				margin-bottom: 1rem;
-			}
-			.btn > btn-primary, .btn-block {
-				border-top-left-radius: unset;
-				border-top-right-radius: unset;
-			}
-			.player {
-				width: 80%;
-				margin-bottom: -1rem;
-			}
-			.list-group-item {
-				padding: 6px 6px;
-			}
-		</style>
-	</head>
-	<body>
-	<div class="container">
-		<div class="py-5">
-			<ul class="nav nav-pills mb-3" id="myTab" role="tablist">
-				<li class="nav-item">
-					<a class="nav-link active" id="backgrounds-tab" data-toggle="tab" href="#backgrounds" role="tab" aria-controls="backgrounds" aria-selected="true">Фоны <span class="badge badge-light" id="bg-data"></span></a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" id="sounds-tab" data-toggle="tab" href="#sounds" role="tab" aria-controls="sounds" aria-selected="false">Звуки <span class="badge badge-light" id="sn-data"></span></a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link" href="spaces-plus.user.js">Скачать Spaces+</a>
-				</li>
-			</ul>
-			<div class="tab-content" id="myTabContent">
-				<div class="tab-pane fade show active" id="backgrounds" role="tabpanel" aria-labelledby="backgrounds-tab"></div>
-				<div class="tab-pane fade" id="sounds" role="tabpanel" aria-labelledby="sounds-tab"><div class="card"><ul class="list-group list-group-flush" id="sounds_rel"></ul></div></div>
-			</div>
-		</div>
-	</div>
-	<script>
-		$.getJSON('data.json', function(data) {
-			$(function() {
-				for(var i = 0; i < data.backgrounds.length;) {
-					$tr = $('<div class="row">');
-					$tr.append(
-						$('<div class="col-md-4"><div class="card"><div class="card-block"><img class="card-img-top" src="' + data.backgrounds[i].url + '" alt="' + data.backgrounds[i].url + '" id="' + data.backgrounds[i].name + '"><input type="button" class="btn btn-primary btn-block" value="Скопировать" onclick="copy(\'' + data.backgrounds[i].name + '\')"></div></div></div>')
-					);
-					i+=1
-					$tr.append(
-						$('<div class="col-md-4"><div class="card"><div class="card-block"><img class="card-img-top" src="' + data.backgrounds[i].url + '" alt="' + data.backgrounds[i].url + '" id="' + data.backgrounds[i].name + '"><input type="button" class="btn btn-primary btn-block" value="Скопировать" onclick="copy(\'' + data.backgrounds[i].name + '\')"></div></div></div>')
-					);
-					i+=1
-					$tr.append(
-						$('<div class="col-md-4"><div class="card"><div class="card-block"><img class="card-img-top" src="' + data.backgrounds[i].url + '" alt="' + data.backgrounds[i].url + '" id="' + data.backgrounds[i].name + '"><input type="button" class="btn btn-primary btn-block" value="Скопировать" onclick="copy(\'' + data.backgrounds[i].name + '\')"></div></div></div>')
-					);
-					i+=1
-					$tr.appendTo('#backgrounds');
-				};
-				$("#bg-data").append(data.backgrounds.length);
-			});
-			$(function() {
-				$.each(data.sounds, function(index, item) {
-					$("#sounds_rel").append('<li class="list-group-item"><audio class="player" controls><source src="'+ item.url +'" type="'+ item.type +'"></audio><button class="btn btn-primary float-right ml-auto" style="padding: 0.375rem 0.75rem;" onclick="window.open(\'' + item.url + '\')">Скопировать</button></li>')
-				});
-				$("#sn-data").append(data.sounds.length);
-			});
-		});
-		function copy(elm) {
-			var img = document.getElementById(elm);
-			var r = document.createRange();
-			r.setStartBefore(img);
-			r.setEndAfter(img);
-			r.selectNode(img);
-			var sel = window.getSelection();
-			sel.addRange(r);
-			document.execCommand('Copy');
-			sel.removeRange(r);
-		};
-	</script>
-	</body>
+    <head>
+        <meta charset="utf-8">
+        <title>Spaces+</title>
+        <link rel="icon" href="favicon.png">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.min.css">
+        <style>
+            .card-body {
+                padding: 0 1.25rem 1.25rem 1.25rem;
+            }
+
+            .btn-radius {
+                border-radius: 0 0 .25rem .25rem;
+            }
+
+            .header-line {
+                position: relative;
+            }
+            
+            .header-line::before {
+                content: '';
+                display: block;
+                border-bottom: 1px solid #cdd4e1;
+                left: 48px;
+                right: 85px;
+                top: 50%;
+                position: absolute;
+            }
+
+            .github-corner:hover .octo-arm {
+                animation: octocat-wave 560ms ease-in-out
+            }
+            
+            @keyframes octocat-wave {
+                0%,
+                100% {
+                    transform: rotate(0)
+                }
+                20%,
+                60% {
+                    transform: rotate(-25deg)
+                }
+                40%,
+                80% {
+                    transform: rotate(10deg)
+                }
+            }
+            
+            @media (max-width:500px) {
+                .github-corner:hover .octo-arm {
+                    animation: none
+                }
+                .github-corner .octo-arm {
+                    animation: octocat-wave 560ms ease-in-out
+                }
+            }
+        </style>
+    </head>
+<body>
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="display-4">Spaces Plus</h1>
+        </div>
+    </div>
+    <a href="https://github.com/spaces-dev/SpacesPlus" class="github-corner">
+        <svg width="80" height="80" viewBox="0 0 250 250" style="fill:#313131; color:#fff; position: absolute; top: 0; border: 0; right: 0;">
+            <path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+            <path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+            <path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
+        </svg>
+    </a>
+    <div class="container container-main">
+        <div class="card mb-4">
+            <h5 class="card-header">Installation</h5>
+            <div class="card-body">
+                <p class="card-text mt-4">
+                    <ol>
+                        <li>
+                            <p>Install the plugin for your browser <code><a href="https://www.tampermonkey.net" target="_blank">Tampermonkey</a></code> or <code><a href="https://www.greasespot.net" target="_blank">Greasemonkey</a></code> and <code><a href="https://violentmonkey.github.io" target="_blank">Violentmonkey</a></code></p>
+                            <ul>
+                                <li><a href="https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo" target="_blank">Google Chrome</a></li>
+                                <li><a href="https://addons.mozilla.org/ru/firefox/addon/greasemonkey/" target="_blank">Mozilla Firefox</a></li>
+                                <li><a href="https://www.microsoft.com/store/p/tampermonkey/9nblggh5162s" target="_blank">Microsoft Edge</a> or <a href="https://microsoftedge.microsoft.com/addons/detail/iikmkjmpaadaobahmlepeloendndfphd" target="_blank">new Edge</a></li>
+                                <li><a href="https://addons.mozilla.org/ru/firefox/addon/greasemonkey/" target="_blank">Safari</a></li>
+                                <li><a href="https://addons.opera.com/ru/extensions/details/tampermonkey-beta/" target="_blank">Opera</a></li>
+                            </ul>
+                        </li>
+                    </ol>
+                    <ol start="2">
+                        <li>
+                            <p>Install Spaces+</p>
+                            <p>You can install this script via <code>GreasyFork</code> or <code>GitHub</code></p>
+                            <ul>
+                                <li>GreasyFork: <a href="https://greasyfork.org/scripts/397890-spaces" target="_blank">https://greasyfork.org/scripts/397890-spaces</a></li>
+                                <li>GitHub: <a href="https://spaces-dev.github.io/spaces-plus.user.js">https://spaces-dev.github.io/spaces-plus.user.js</a></li>
+                            </ul>
+                        </li>
+                    </ol>
+                </p>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" id="changelog-tab" data-toggle="tab" href="#changelog" role="tab" aria-controls="changelog" aria-selected="true">Changelog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="backgrounds-tab" data-toggle="tab" href="#backgrounds" role="tab" aria-controls="backgrounds" aria-selected="false">Backgrounds <span class="badge badge-primary" id="bg-badge"></span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" id="sounds-tab" data-toggle="tab" href="#sounds" role="tab" aria-controls="sounds" aria-selected="false">Sounds <span class="badge badge-primary" id="sn-badge"></span></a>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body tab-content">
+                <div class="tab-pane fade show active" id="changelog" role="tabpanel" aria-labelledby="changelog-tab"><div class="row" id="changelog-rel"></div></div>
+                <div class="tab-pane fade" id="backgrounds" role="tabpanel" aria-labelledby="backgrounds-tab"><div class="row" id="backgrounds-rel"></div></div>
+                <div class="tab-pane fade" id="sounds" role="tabpanel" aria-labelledby="sounds-tab"><div class="row" id="sounds-rel"></div></div>
+            </div>
+        </div>
+    </div>
+    <div class="text-center mt-4 mb-4">Created by <a href="https://crashmax.ru" target="_blank">crashmax</a> with <span class="text-danger">♥</span></div>
+    <script>
+        function rever(n){return n?n.toString().split("").join("."):n}$.getJSON("updater.json").done(function(n){$(function(){$.each(n.history,function(n,t){$("#changelog-rel").append('<div class="card-block mt-4 col-sm-12"><div class="header-line">v'+rever(t.build)+'<div class="pull-right">'+t.date+"</div></div>"+t.changes+"</div>")})})}),$.getJSON("data.json").done(function(n){$(function(){$.each(n.backgrounds,function(n,t){$("#backgrounds-rel").append('<div class="card-block mt-4 col-sm-2"><img class="card-img-top" src="'+t.url+'"><button type="button" class="clipboard-b btn btn-primary btn-block btn-radius" data-clipboard-text="'+t.url+'">Copy</button></div>')}),$("#bg-badge").append(n.backgrounds.length)}),$(function(){$.each(n.sounds,function(n,t){$("#sounds-rel").append('<div class="card-block mt-4 col-sm-12"><audio src="'+t.url+'" id="'+t.name+'-s" type="'+t.type+'"></audio><div class="input-group"><button class="input-group-addon" onClick="document.getElementById(\''+t.name+'-s\').play()"><i class="fa fa-play"></i></button><input type="text" id="'+t.name+'-c" class="form-control" value="'+t.url+'" readonly><button class="clipboard-s input-group-addon" data-clipboard-target="#'+t.name+'-c"><i class="fa fa-clipboard"></i></button></div></div>')}),$("#sn-badge").append(n.sounds.length)})}),$(function(){new ClipboardJS(".clipboard-b").on("success",function(n){n.clearSelection(),n.trigger.className="clipboard-b btn btn-success btn-block btn-radius",n.trigger.innerHTML="Copied!",window.setTimeout(function(){n.trigger.className="clipboard-b btn btn-primary btn-block btn-radius",n.trigger.innerHTML="Copy"},3e3)})}),$(function(){new ClipboardJS(".clipboard-s").on("success",function(n){n.clearSelection(),n.trigger.innerHTML="Copied!",window.setTimeout(function(){n.trigger.innerHTML='<i class="fa fa-clipboard"></i>'},3e3)})});
+    </script>
+</body>
 </html>
