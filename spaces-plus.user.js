@@ -6,7 +6,7 @@
 // @icon            https://spaces-dev.github.io/favicon.png
 // @include         /^(http|https):\/\/(spaces\.ru|spac\.me|spcs\.me|spaces\.im|gdespaces\.com|spac1\.com).*$/
 // @match           *://(spaces.ru|spac.me|spcs.me|spaces.im|gdespaces.com|spac1.com)/*
-// @version         2.1.9
+// @version         2.2.0
 // @grant           none
 // @require         https://spaces-dev.github.io/src/attaches/js/colorpicker.js
 // @downloadURL     https://spaces-dev.github.io/spaces-plus.user.js
@@ -17,8 +17,7 @@
     function spacesPlus() {
         var _PROTOCOL = document.location.protocol.toString();
         var _DOMAIN = document.location.hostname.toString();
-        var VERSION = 20;
-        var BUILD = 219;
+        var VERSION = 220;
         var onlineLock = null;
         var favLock = null;
         var favRLock = null;
@@ -44,11 +43,11 @@
             'blocked': true,
             'rscroll': false,
             'hrightbar': false,
+            'apidebug': false,
             'playerdn': true,
+            'nredirect': true,
             'coins': true,
             'karma': true,
-            'darkMode': false,
-            'darkModeNav': false,
             'online': true,
             'ads': true,
             'myEvents': false,
@@ -56,7 +55,7 @@
             'sticker': true,
             'fixes': true,
             'bodystyle': true,
-            'upVersion': null,
+            'upVersion': VERSION,
             'bodystyleSetting': {
                 "url": "https://" + gitPages + "/src/backgrounds/default.jpg",
                 "color": '#DAE1E8',
@@ -90,7 +89,6 @@
             'comments': "Пакетное удаление комментариев",
             'blogsd': "Пакетное удаление блогов",
             'readersd': "Пакетное удаление читателей",
-            'darkMode': "Темная тема",
             'friendsOn': "Панель друзей онлайн",
             'myEvents': "Звук уведомлений",
             'online': "Точное время онлайн в анкетах",
@@ -99,6 +97,7 @@
             'rotate': "Кнопка поворота фото/видео в просмотрщике",
             'playback': "Кнопка ускорения видео",
             'playerdn': "Кнопка загрузки трека из плеера",
+            'nredirect': "Внешние ссылки без редиректа",
             'rscroll': "Прокрутка страницы справа",
             'hrightbar': "Скрыть правое меню",
             'blocked': "Открытые разделы удаленных пользователей",
@@ -272,7 +271,7 @@
                                 }
                             }
                         } catch (e) {
-                            main.console.error('Ошибка (NEWBEE_JSON): ' + e.name + ":" + e.message + "\n" + e.stack);
+                            main.console.error('Ошибка (NEWBEE-JSON): ' + e.name + ":" + e.message + "\n" + e.stack);
                         }
                     });
                 }
@@ -309,6 +308,7 @@
                                     if (setArea) {
                                         for (var i in _SETTINGS) {
                                             if (typeof _SETSTRINGS[i] != "undefined") {
+                                                var eventAlert = main.qs("#SP_PLUS_ALERT");
                                                 var tmpCkb = main.ce("input", {
                                                     id: "sp_set_" + i,
                                                     type: "checkbox",
@@ -321,16 +321,6 @@
                                                         main.setCookie("SP_PLUS_SET", jsonSet, null);
                                                         if (e.target.id == "sp_set_rscroll") {
                                                             main.scrollMove(e.target.checked);
-                                                        } else if (e.target.id == "sp_set_darkMode") {
-                                                            main.darkMode(e.target.checked);
-                                                            if (e.target.checked) {
-                                                                main.darkModeNav(e.target);
-                                                            } else {
-                                                                var dmWrap = main.qs("#SP_DARKMODE_WRAP");
-                                                                if (dmWrap) {
-                                                                    main.remove(dmWrap);
-                                                                }
-                                                            }
                                                         } else if (e.target.id == "sp_set_hrightbar") {
                                                             main.hiddenRightbar(e.target.checked);
                                                         } else if (e.target.id == "sp_set_bodystyle") {
@@ -349,7 +339,6 @@
                                                             } else {
                                                                 eventsCounter = 0;
                                                                 var eventDiv = main.qs("#SP_PLUS_EVENTS");
-                                                                var eventAlert = main.qs("#SP_PLUS_ALERT");
                                                                 if (eventAlert) {
                                                                     main.remove(eventAlert);
                                                                 }
@@ -379,13 +368,16 @@
                                                                 }
                                                             }
                                                         } else if (e.target.id == "sp_set_sticker") {
-                                                            main.freeSticker(e.target.checked);
+                                                            if (e.target.checked) {
+                                                                main.freeStickers();
+                                                            } else {
+                                                                document.location.reload();
+                                                            }
                                                         } else if (e.target.id == "sp_set_fixes") {
                                                             if (e.target.checked) {
                                                                 main.allFixes();
                                                                 main.alert("Незначительные исправления<div class='pad_t_a'></div><small class='pad_t_a grey'>Данная функция необходима для исправления неудачных обновлений сайта.<div class='pad_t_a'></div>Исправлено: <ul><li>Кнопка почты/ленты в шапке</li></ul></div>", 1, 1);
                                                             } else {
-                                                                var eventAlert = main.qs("#SP_PLUS_ALERT");
                                                                 if (eventAlert) {
                                                                     main.remove(eventAlert);
                                                                 }
@@ -394,6 +386,8 @@
                                                         }
                                                     }
                                                 });
+                                            }
+                                            if (typeof _SETSTRINGS[i] != "undefined") {
                                                 var tmpLbl = main.ce("label", {
                                                     html: _SETSTRINGS[i],
                                                     attr: {
@@ -403,8 +397,6 @@
                                                 var bstlWrap2 = main.ce("label", {
                                                     class: "stnd-link bstrwrap"
                                                 });
-                                            }
-                                            if (typeof _SETSTRINGS[i] != "undefined") {
                                                 bstlWrap2.appendChild(tmpCkb);
                                                 bstlWrap2.appendChild(tmpLbl);
                                                 setArea.appendChild(bstlWrap2);
@@ -413,9 +405,6 @@
                                         }
                                         if (_SETTINGS.friendsOn) {
                                             main.setFriend(main.qs("#sp_set_friendsOn"));
-                                        }
-                                        if (_SETTINGS.darkMode) {
-                                            main.darkModeNav(main.qs("#sp_set_darkMode"));
                                         }
                                         if (_SETTINGS.myEvents) {
                                             main.evenstSupport(main.qs("#sp_set_myEvents"));
@@ -461,7 +450,7 @@
                                                 if (back) {
                                                     back.href = _PROTOCOL + "//" + _DOMAIN + "/settings/?sp_plus_settings=1";
                                                 }
-                                                if (!/(\?|&)sp_cookie_editor=1/i.test(lct)) {
+                                                if (!/(\&)sp_cookie_editor=1/i.test(lct)) {
                                                     main.historyPush({
                                                         'sp_plus_settings': urlSett,
                                                         'sp_cookie_editor': urlSettEditor
@@ -492,13 +481,13 @@
                                                 if (back) {
                                                     back.href = _PROTOCOL + "//" + _DOMAIN + "/settings/?sp_plus_settings=1";
                                                 }
-                                                if (!/(\?|&)sp_backup=1/i.test(lct)) {
+                                                if (!/(\&)sp_backup=1/i.test(lct)) {
                                                     main.historyPush({
                                                         'sp_plus_settings': urlSett,
                                                         'sp_backup': urlSettBackup
                                                     }, _PROTOCOL + "//" + _DOMAIN + "/settings/?sp_plus_settings=1&sp_backup=1", "Spaces+: Импорт и экспорт параметров");
                                                 }
-                                                main.backup("#SP_PLUS_SETAREA");
+                                                main.spacesBackup("#SP_PLUS_SETAREA");
                                                 return false;
                                             }
                                         });
@@ -522,13 +511,13 @@
                                                 if (back) {
                                                     back.href = _PROTOCOL + "//" + _DOMAIN + "/settings/?sp_plus_settings=1";
                                                 }
-                                                if (!/(\?|&)sp_changelog=1/i.test(lct)) {
+                                                if (!/(\&)sp_changelog=1/i.test(lct)) {
                                                     main.historyPush({
                                                         'sp_plus_settings': urlSett,
                                                         'sp_changelog': urlSettChangeLog
                                                     }, _PROTOCOL + "//" + _DOMAIN + "/settings/?sp_plus_settings=1&sp_changelog=1", "Spaces+: История обновлений");
                                                 }
-                                                main.changeLog("#SP_PLUS_SETAREA");
+                                                main.spacesChangelog("#SP_PLUS_SETAREA");
                                                 return false;
                                             }
                                         });
@@ -563,7 +552,7 @@
                                         });
                                         var ver = main.ce("div", {
                                             style: "float: right;",
-                                            html: 'v' + main.rever(BUILD)
+                                            html: 'v' + main.rever(VERSION)
                                         });
                                         var target = main.qs("#SP_PLUS_ABOUT");
                                         aboutWidget.appendChild(content);
@@ -581,34 +570,19 @@
                             if (urlSett) {
                                 document.title = "Настройки Spaces+";
                                 var clickEvent = document.createEvent("MouseEvent");
+                                var clickEvent2 = document.createEvent("MouseEvent");
                                 clickEvent.initEvent("click", true, true);
                                 settLink.dispatchEvent(clickEvent);
-                                if (/#([da-z0-9\_]+)$/i.test(lct)) {
-                                    var seid = /#([da-z0-9\_]+)$/i.exec(lct)[0];
-                                    var seidel = main.qs(seid);
-                                    if (seidel) {
-                                        if (seid == "#sp_protocol_togl" || seid == "#sp_plus_reset" || seid == "#sp_cookie_editor" || seid == "#wrap_spaces_option") {
-                                            seidel.style.backgroundColor = "#FFC107";
-                                        } else {
-                                            seidel.nextElementSibling.style.backgroundColor = "#FFC107";
-                                        }
-                                        setTimeout(function() {
-                                            window.scrollTo(0, seidel.offsetTop);
-                                        }, 100);
-                                    }
-                                } else if (urlSettEditor) {
+                                if (urlSettEditor) {
                                     document.title = "Spaces+: Редактор cookies";
-                                    var clickEvent2 = document.createEvent("MouseEvent");
                                     clickEvent2.initEvent("click", true, true);
                                     main.qs("#sp_cookie_editor").dispatchEvent(clickEvent2);
                                 } else if (urlSettChangeLog) {
                                     document.title = "Spaces+: История обновлений";
-                                    var clickEvent2 = document.createEvent("MouseEvent");
                                     clickEvent2.initEvent("click", true, true);
                                     main.qs("#sp_changelog").dispatchEvent(clickEvent2);
                                 } else if (urlSettBackup) {
                                     document.title = "Spaces+: Импорт и экспорт параметров";
-                                    var clickEvent2 = document.createEvent("MouseEvent");
                                     clickEvent2.initEvent("click", true, true);
                                     main.qs("#sp_backup").dispatchEvent(clickEvent2);
                                 }
@@ -623,11 +597,11 @@
                 try {
                     if (!("Notification" in window)) {
                         main.alert("Ваш браузер не поддерживает уведомления!", 1, null);
-                    } else if (Notification.permission.toLowerCase() === "granted") {
+                    } else if (Notification.permission.toLowerCase() == "granted") {
                         main.notificationShow(title, option, url);
-                    } else if (Notification.permission.toLowerCase() !== "denied") {
+                    } else if (Notification.permission.toLowerCase() != "denied") {
                         Notification.requestPermission(function(permission) {
-                            if (permission.toLowerCase() === "granted") {
+                            if (permission.toLowerCase() == "granted") {
                                 main.notificationShow(title, option, url);
                             } else {
                                 main.alert("Вы <b style='color: #800;'>запретили</b> показывать уведомления для сайта " + _DOMAIN + "!<br/>Зайдите в настройки браузера и настройте доступ.", 1, null);
@@ -651,7 +625,7 @@
                         };
                     }
                 } catch (e) {
-                    main.console.error('Ошибка (NOTIFICATION_SHOW): ' + e.name + ":" + e.message + "\n" + e.stack);
+                    main.console.error('Ошибка (NOTIFICATION-SHOW): ' + e.name + ":" + e.message + "\n" + e.stack);
                 }
             },
             setFriend: function(e) {
@@ -670,19 +644,26 @@
                         type: "text",
                         class: "text-input",
                         size: 4,
+                        attr: {
+                            maxlength: 2
+                        },
                         value: _SETTINGS.friendsOnMax
                     });
                     frMax.onchange = frMax.oninput = function(e) {
                         if (!isNaN(e.target.value)) {
                             var frMaxVal = parseInt(e.target.value, 10);
+                            frMax.className = "text-input";
                             if (frMaxVal > 15 || frMaxVal < 1) {
                                 frMaxVal = 10;
+                                frMax.className = "text-input sp-input-error";
                             }
                             countFriends = 0;
                             _SETTINGS.friendsOnMax = frMaxVal;
                             var jsonSet = JSON.stringify(_SETTINGS);
                             main.setCookie("SP_PLUS_SET", jsonSet, null);
                             main.friendsOnline(1);
+                        } else {
+                            frMax.className = "text-input sp-input-error";
                         }
                     };
                     var frMaxLbl = main.ce("label", {
@@ -714,7 +695,7 @@
                     frMaxWrap.appendChild(label);
                     main.insertAfter(frMaxWrap, e.parentNode);
                 } catch (e) {
-                    main.console.error('Ошибка (FRIENDS_MAX_SUPPORT): ' + e.name + ":" + e.message + "\n" + e.stack);
+                    main.console.error('Ошибка (FRIENDS-MAX-SUPPORT): ' + e.name + ":" + e.message + "\n" + e.stack);
                 }
             },
             bgSettings: function(e) {
@@ -754,14 +735,14 @@
                         class: "text-input"
                     });
                     bstyle.onchange = bstyle.oninput = function(a) {
-                        if (main.isValidUrl(a.target.value) || a.target.value == '') {
-                            a.target.style.backgroundColor = "";
+                        if ((main.isValidUrl(a.target.value) && /\.(jpg|jpeg|png|gif)$/i.test(a.target.value)) || main.trim(a.target.value) == "") {
                             _SETTINGS.bodystyleSetting.url = main.trim(a.target.value);
                             var jsonSet = JSON.stringify(_SETTINGS);
                             main.setCookie("SP_PLUS_SET", jsonSet, null);
                             main.setStyle();
+                            bstyle.className = "text-input";
                         } else {
-                            a.target.style.backgroundColor = "#FF7C7C";
+                            bstyle.className = "text-input sp-input-error";
                         }
                     };
                     var bstylec = main.ce("input", {
@@ -772,13 +753,13 @@
                     });
                     bstylec.onchange = bstylec.oninput = function(a) {
                         if (/^\#([A-Za-z0-9]{3}|[A-Za-z0-9]{6})$/i.test(a.target.value) || a.target.value == '') {
-                            a.target.style.backgroundColor = "";
                             _SETTINGS.bodystyleSetting.color = main.trim(a.target.value);
                             var jsonSet = JSON.stringify(_SETTINGS);
                             main.setCookie("SP_PLUS_SET", jsonSet, null);
                             main.setStyle();
+                            bstylec.className = "text-input";
                         } else {
-                            a.target.style.backgroundColor = "#FF7C7C";
+                            bstylec.className = "text-input sp-input-error";
                         }
                     };
                     var inbstyle = main.ce("input", {
@@ -861,7 +842,7 @@
                         main.bgColor()
                     }
                 } catch (e) {
-                    main.console.error('Ошибка (BODYSTYLE_SET): ' + e.name + ":" + e.message + "\n" + e.stack);
+                    main.console.error('Ошибка (BODYSTYLE-SET): ' + e.name + ":" + e.message + "\n" + e.stack);
                 }
             },
             bgColor: function() {
@@ -917,26 +898,23 @@
                         td2div1.appendChild(td2div1div1);
                         td2.appendChild(td2div1);
                         tr.appendChild(td2);
-
                         tbody.appendChild(tr);
                         table.appendChild(tbody);
                         stdnC.appendChild(table);
                         SPB.appendChild(stdnC);
-
                         var container = td2div1div1;
                         setTimeout(function() {
                             var picker = new CP(container, false, container);
                             document.getElementById("color-input").onchange = document.getElementById("color-input").oninput = function(a) {
                                 if (/^\#([A-Za-z0-9]{3}|[A-Za-z0-9]{6})$/i.test(a.target.value) || a.target.value == '') {
-                                    a.target.style.backgroundColor = '';
+                                    a.target.className = "text-input";
                                     _SETTINGS.bodystyleSetting.color = main.trim(a.target.value);
                                     var jsonSet = JSON.stringify(_SETTINGS);
                                     main.setCookie("SP_PLUS_SET", jsonSet, null);
                                     main.setStyle();
                                     picker.set(_SETTINGS.bodystyleSetting.color);
                                 } else {
-                                    a.target.style.backgroundColor = "#FF7C7C";
-                                    picker.set("FF7C7C");
+                                    a.target.className = "text-input sp-input-error";
                                 }
                             };
                             picker.enter();
@@ -967,10 +945,11 @@
                         }, 1);
                     }
                 } catch (e) {
-                    main.console.error('Ошибка (BODYSTYLE_COLOR_SET): ' + e.name + ":" + e.message + "\n" + e.stack);
+                    main.console.error('Ошибка (BODYSTYLE-COLOR-SET): ' + e.name + ":" + e.message + "\n" + e.stack);
                 }
             },
             bgImage: function() {
+                var rev = main.service(1);
                 try {
                     if (!main.qs("#SP_WRAP_IMAGE")) {
                         if (main.qs("#SP_WRAP_COLOR")) {
@@ -981,7 +960,7 @@
                             rel: "stylesheet",
                             type: "text/css",
                             id: "SP_PLUS_IMAGE_STYLE",
-                            href: "https://" + gitPages + "/src/attaches/css/bodystyle.css?r=" + main.service(1)
+                            href: "https://" + gitPages + "/src/attaches/css/bodystyle.css?r=" + rev
                         });
                         document.getElementsByTagName('head')[0].appendChild(style);
                         var SPB = main.qs("#SP_PLUS_BODYSTYLE");
@@ -992,7 +971,7 @@
                         var gd = main.ce("div", {
                             class: "js-gallery_skip wbg oh tiles_block tiles_wrapper"
                         });
-                        main.ajax('https://' + gitPages + '/data.json?r=' + main.service(1), 'GET', null, function(data) {
+                        main.ajax('https://' + gitPages + '/data.json?r=' + rev, 'GET', null, function(data) {
                             var data = JSON.parse(data);
                             for (var i = 0; i < data.backgrounds.length; i++) {
                                 var d1 = main.ce("div", {
@@ -1031,7 +1010,7 @@
                         }, 4);
                     }
                 } catch (e) {
-                    main.console.error('Ошибка (BODYSTYLE_IMAGE_SET): ' + e.name + ":" + e.message + "\n" + e.stack);
+                    main.console.error('Ошибка (BODYSTYLE-IMAGE-SET): ' + e.name + ":" + e.message + "\n" + e.stack);
                 }
             },
             evenstSupport: function(e) {
@@ -1048,13 +1027,13 @@
                             if (!("Notification" in window)) {
                                 main.alert("Ваш браузер не поддерживает уведомления!", 1, null);
                                 return false;
-                            } else if (Notification.permission.toLowerCase() === "granted") {
+                            } else if (Notification.permission.toLowerCase() == "granted") {
                                 _SETTINGS.events.notifications = e.target.checked;
                                 var jsonSet = JSON.stringify(_SETTINGS);
                                 main.setCookie("SP_PLUS_SET", jsonSet, null);
-                            } else if (Notification.permission.toLowerCase() !== "denied") {
+                            } else if (Notification.permission.toLowerCase() != "denied") {
                                 Notification.requestPermission(function(permission) {
-                                    if (permission.toLowerCase() === "granted") {
+                                    if (permission.toLowerCase() == "granted") {
                                         _SETTINGS.events.notifications = e.target.checked;
                                         var jsonSet = JSON.stringify(_SETTINGS);
                                         main.setCookie("SP_PLUS_SET", jsonSet, null);
@@ -1117,8 +1096,9 @@
                             _SETTINGS.events.url = main.trim(e.target.value);
                             var jsonSet = JSON.stringify(_SETTINGS);
                             main.setCookie("SP_PLUS_SET", jsonSet, null);
+                            eventsUrl.className = "text-input";
                         } else {
-                            e.target.style.backgroundColor = "#FF7C7C";
+                            eventsUrl.className = "text-input sp-input-error";
                         }
                     };
                     var testPlay = main.ce("span", {
@@ -1227,7 +1207,7 @@
                     eventsWrap.appendChild(label3);
                     main.insertAfter(eventsWrap, e.parentNode);
                 } catch (e) {
-                    main.console.error('Ошибка (EVENTS_SUP): ' + e.name + ":" + e.message + "\n" + e.stack);
+                    main.console.error('Ошибка (EVENTS-SUP): ' + e.name + ":" + e.message + "\n" + e.stack);
                 }
             },
             historyPush: function(state, url, title) {
@@ -1241,26 +1221,14 @@
             remove: function(e) {
                 return e.parentNode.removeChild(e);
             },
-            wrap: function(toWrap, wrapper) {
-                wrapper = wrapper || main.ce("div", null);
-                if (toWrap.nextSibling) {
-                    main.inBefore(wrapper, toWrap.nextSibling);
-                } else {
-                    toWrap.parentNode.appendChild(wrapper);
-                }
-                return wrapper.appendChild(toWrap);
-            },
-            is_array: function(v) {
-                return (v instanceof Array);
-            },
-            scrollMove: function(t) {
+            scrollMove: function() {
                 try {
                     var scroller = main.qs("#scroll_page");
-                    if (scroller && !scroller.hasAttribute("sp-replace") && t) {
+                    if (scroller && !scroller.hasAttribute("sp-replace")) {
                         scroller.style.left = "auto";
                         scroller.style.right = "0";
                         scroller.setAttribute("sp-replace", "1");
-                    } else if (!_SETTINGS.rscroll && scroller && scroller.hasAttribute("sp-replace") && !t) {
+                    } else if (!_SETTINGS.rscroll && scroller && scroller.hasAttribute("sp-replace")) {
                         scroller.style.left = "0";
                         scroller.style.right = "auto";
                         scroller.removeAttribute("sp-replace");
@@ -1269,13 +1237,13 @@
                     main.console.error('Ошибка (SCROLLER): ' + e.name + ":" + e.message + "\n" + e.stack);
                 }
             },
-            hiddenRightbar: function(t) {
+            hiddenRightbar: function() {
                 try {
                     var rightbar = main.qs("#page_rightbar");
-                    if (rightbar && !rightbar.hasAttribute("sp-hidden-rightbar") && t) {
+                    if (rightbar && !rightbar.hasAttribute("sp-hidden-rightbar")) {
                         rightbar.style.display = "none";
                         rightbar.setAttribute("sp-hidden-rightbar", "1");
-                    } else if (!_SETTINGS.hrightbar && rightbar && rightbar.hasAttribute("sp-hidden-rightbar") && !t) {
+                    } else if (!_SETTINGS.hrightbar && rightbar && rightbar.hasAttribute("sp-hidden-rightbar")) {
                         rightbar.style.display = "block";
                         rightbar.removeAttribute("sp-hidden-rightbar");
                     }
@@ -1429,7 +1397,7 @@
                             target.appendChild(wrap);
                         }
                     } catch (e) {
-                        main.console.error('Ошибка (COOKIE_EDITOR): ' + e.name + ":" + e.message + "\n" + e.stack);
+                        main.console.error('Ошибка (COOKIE-EDITOR): ' + e.name + ":" + e.message + "\n" + e.stack);
                     }
                 }
             },
@@ -1438,19 +1406,26 @@
                     id: "wrap_spaces_option"
                 });
                 var apidebug = main.ce("a", {
-                    href: 'javascript:var Arr=[\'<div class="time-block" style="text-align: left;" id="wrap_spacesAction_AD"><a href="#" id="api_debug-button">API-Debugger</a><div id="api_debug-place"></div></div>\',"append","parent","#navi","debugger"];$(Arr[3])[Arr[2]]()[Arr[1]](Arr[0]),require(Arr[4]);void(0);',
+                    href: "#",
                     class: "stnd-link stnd-link_arr",
-                    id: "sp_spacesAction_AD",
-                    html: '<span class="b"><span class="ico ico_settings"></span> API-Отладчик<span class="ico ico_arr ico_m"></span></span>',
+                    html: (_SETTINGS.apidebug ? '<span class="b"><span class="sp sp-remove-grey"></span> Убрать отладчик<span class="ico ico_arr ico_m"></span></span>' : '<span class="b"><span class="ico ico_settings"></span> Включить отладчик<span class="ico ico_arr ico_m"></span></span>'),
                     style: "font-size: small;",
                     onclick: function() {
-                        var check = main.qs("#wrap_spacesAction_AD");
-                        if (check) {
-                            main.remove(check);
+                        if (!_SETTINGS.apidebug) {
+                            _SETTINGS.apidebug = true;
+                            var jsonSet = JSON.stringify(_SETTINGS);
+                            main.setCookie("SP_PLUS_SET", jsonSet, null);
+                            main.apiDebugger();
                             main.setLocation(document.location.href);
-                            return false;
+                        } else {
+                            var panel = main.qs("#spaces_api_debugger");
+                            _SETTINGS.apidebug = false;
+                            var jsonSet = JSON.stringify(_SETTINGS);
+                            main.setCookie("SP_PLUS_SET", jsonSet, null);
+                            main.remove(panel);
+                            main.setLocation(document.location.href);
                         }
-                        return true;
+                        return false;
                     }
                 });
                 var beta = main.getCookie("beta");
@@ -1557,9 +1532,6 @@
                 var rtrim = /^[\s\uFEFF\xA0]+|[\s\uFEFF\xA0]+$/g;
                 return str.replace(rtrim, '');
             },
-            rand: function(min, max) {
-                return Math.round(Math.random() * (max - min)) + min;
-            },
             inBefore: function(elem, refElem) {
                 var parent = refElem.parentNode;
                 return parent.insertBefore(elem, refElem);
@@ -1579,8 +1551,8 @@
                 return document.querySelector(e);
             },
             getClassName: function(data, t) {
-                var data = data.split(".");
                 var list = new Array(),
+                    data = data.split("."),
                     nodes = document.getElementsByTagName(data[0]);
                 for (var i = 0; i < nodes.length; i++) {
                     if (nodes[i].className.indexOf(data[1]) >= 0 && !t) {
@@ -1630,20 +1602,6 @@
                 } else {
                     main.console.info(time);
                     return null;
-                }
-            },
-            setSelection: function(target) {
-                var rng, sel;
-                if (document.createRange) {
-                    rng = document.createRange();
-                    rng.selectNode(target);
-                    sel = window.getSelection();
-                    sel.removeAllRanges();
-                    sel.addRange(rng);
-                } else {
-                    rng = document.body.createTextRange();
-                    rng.moveToElementText(target);
-                    rng.select();
                 }
             },
             sound: function(f, v) {
@@ -1780,7 +1738,9 @@
                                                         }]
                                                     }
                                                 };
-                                                var displayN = main.getClassName('span.s_i s_i_friends');
+                                                var disableAvatar = main.find(document.getElementsByTagName('span'), {
+                                                    className: "s_i s_i_exit"
+                                                });
                                                 var json2 = main.extend(_json2, JSON.parse(res2));
                                                 var friendsList = json2.tabbed_panel.tabs[1].content.list;
                                                 if (friendsList) {
@@ -1803,7 +1763,7 @@
                                                     frOnDiv.appendChild(main.ce("a", {
                                                         href: _PROTOCOL + '//' + _DOMAIN + '/mysite/index/' + friendsList[i].name + '/',
                                                         class: "li",
-                                                        html: '<span class="comm_ava m for_avatar ' + displayN + '"><img src="' + friendsList[i].avatar.previewURL + '" alt="" class="preview s21_20"></span><span class="online-status m"><img class="p14 online_status_ico" src="' + _PROTOCOL + '//spac.me/i/' + friendsList[i].online_status.on_img + '" alt="(ON)"></span><span class="block-item__title m break-word">' + friendsList[i].name + '</span>'
+                                                        html: (disableAvatar ? '<span class="comm_ava m for_avatar"><img src="' + friendsList[i].avatar.previewURL + '" class="preview s21_20"></span>' : '') + '<span class="online-status m"><img class="p14 online_status_ico" src="' + _PROTOCOL + '//spac.me/i/' + friendsList[i].online_status.on_img + '" alt="(ON)"></span><span class="block-item__title m break-word">' + friendsList[i].name + '</span>'
                                                     }));
                                                 }
                                                 frCount.parentNode.removeAttribute("sp-click-el");
@@ -1813,7 +1773,7 @@
                                             main.remove(frOnDiv);
                                         }
                                     } catch (e) {
-                                        main.console.error('Ошибка (FRIENDS_ONLINE_JSON): ' + e.name + ":" + e.message + "\n" + e.stack);
+                                        main.console.error('Ошибка (FRIENDS-ONLINE-JSON): ' + e.name + ":" + e.message + "\n" + e.stack);
                                     }
                                 });
                                 parent.appendChild(frOnDiv);
@@ -1824,7 +1784,7 @@
                             }
                         }
                     } catch (e) {
-                        main.console.error('Ошибка (FRIENDS_ONLINE): ' + e.name + ":" + e.message + "\n" + e.stack);
+                        main.console.error('Ошибка (FRIENDS-ONLINE): ' + e.name + ":" + e.message + "\n" + e.stack);
                     }
                 }
             },
@@ -1861,13 +1821,13 @@
                                             }
                                         }
                                     } catch (e) {
-                                        main.console.error('Ошибка (JSON_ONLINE): ' + e.name + ":" + e.message + "\n" + e.stack);
+                                        main.console.error('Ошибка (JSON-ONLINE): ' + e.name + ":" + e.message + "\n" + e.stack);
                                     }
                                 }
                             });
                         }
                     } catch (e) {
-                        main.console.error('Ошибка (ONLINE): ' + e.name + ":" + e.message + "\n" + e.stack);
+                        main.console.error('Ошибка (ONLINE-WIDGET): ' + e.name + ":" + e.message + "\n" + e.stack);
                     }
                 } else if (path != target) {
                     onlineLock = null;
@@ -1876,11 +1836,12 @@
             favoriteAdd: function() {
                 var locationHref = document.location.href;
                 var path = main.getPath("method");
+                var path2 = main.getPath("index");
                 if (locationHref == _PROTOCOL + "//" + _DOMAIN + "/bookmarks/add/?irb526786=1" && !favRLock) {
                     favRLock = locationHref;
                     main.setLocation(_PROTOCOL + "//" + _DOMAIN + "/bookmarks/?irb526786=1");
                 }
-                if ((path == 'mysite' || path == 'anketa' || path == 'activity') && favLock != locationHref) {
+                if ((path == 'mysite' || (path == 'anketa' && path2 != 'edit') || path == 'activity') && favLock != locationHref) {
                     var fvtools = main.qs("#SP_PLUS_INFAVORITE");
                     favLock = locationHref;
                     try {
@@ -1921,7 +1882,7 @@
                                             }
                                         }
                                     } catch (e) {
-                                        main.console.error('Ошибка (JSON_FAVORITE): ' + e.name + ":" + e.message + "\n" + e.stack);
+                                        main.console.error('Ошибка (JSON-FAVORITE): ' + e.name + ":" + e.message + "\n" + e.stack);
                                     }
                                 }
                             });
@@ -1943,7 +1904,8 @@
                         var button_rotate = main.ce("a", {
                             class: "gallery__tools_button",
                             id: "SP_IMAGE_ROTATE",
-                            html: "<span class='ico_gallery m' style='background-position: -54px -84px;'></span>",
+                            title: "Повернуть",
+                            html: "<span class='ico_gallery ico_gallery_reload m'></span>",
                             onclick: function() {
                                 var beta = main.getCookie("beta");
                                 var ImageOrVideo = main.find(Image.getElementsByTagName("img"), {
@@ -1961,7 +1923,8 @@
                                         Player[0].className = "jwvideo rotate" + angleV;
                                     }
                                 } else {
-                                    main.alert("Ошибка!<div class='pad_t_a'></div><small><b>" + ImageOrVideo + "</b></small>");
+                                    angleI = (angleI + 90) % 360;
+                                    Image.className = "accel-3d rotate" + angleI;
                                 }
                                 return false;
                             }
@@ -1969,16 +1932,18 @@
                         target_button.after(button_rotate);
                     }
                 } catch (e) {
-                    main.console.error('Ошибка (ROTATE): ' + e.name + ":" + e.message + "\n" + e.stack);
+                    main.console.error('Ошибка (ROTATE-MEDIA): ' + e.name + ":" + e.message + "\n" + e.stack);
                 }
             },
             videoPlayback: function() {
                 var target = main.qs("#main_wrap");
                 var playback = main.qs("#SP_PLAYBACK_VIDEO");
                 try {
-                    var jwcontrols = main.find(target.getElementsByTagName("span"), {
-                        className: "jwcontrols"
-                    });
+                    if (target) {
+                        var jwcontrols = main.find(target.getElementsByTagName("span"), {
+                            className: "jwcontrols"
+                        });
+                    }
                     if (jwcontrols != null && playback == null) {
                         var target_button = main.find(target.getElementsByTagName("span"), {
                             className: "jwtext jwduration jwhidden"
@@ -1989,7 +1954,7 @@
                             html: "x" + videoPlayback,
                             onclick: function() {
                                 videoPlayback = (videoPlayback + 0.25) % 2.25;
-                                if (videoPlayback == 0) videoPlayback = 0.25;
+                                if (videoPlayback == 0) videoPlayback = 0.5;
                                 button_rotate.innerHTML = "x" + videoPlayback;
                                 document.querySelector('video').playbackRate = videoPlayback;
                                 return false;
@@ -1998,7 +1963,7 @@
                         target_button[0].after(button_rotate);
                     }
                 } catch (e) {
-                    main.console.error('Ошибка (VIDEOPAYBACK): ' + e.name + ":" + e.message + "\n" + e.stack);
+                    main.console.error('Ошибка (VIDEO-PLAYBACK): ' + e.name + ":" + e.message + "\n" + e.stack);
                 }
             },
             isFav: function(id, el, nm, html) {
@@ -2026,13 +1991,13 @@
                                 };
                             }
                         } catch (e) {
-                            main.console.error('Ошибка (JSON_ISFAVORITE): ' + e.name + ":" + e.message + "\n" + e.stack);
+                            main.console.error('Ошибка (JSON-ISFAVORITE): ' + e.name + ":" + e.message + "\n" + e.stack);
                         }
                     }
                 });
             },
-            bannedHTML: function(nick, type, blocked, id) {
-                var out = type ? '<div class="widgets-group links-group">' + (id ? '<span id="SP_PLUS_INFAV"><a href="' + _PROTOCOL + '//' + _DOMAIN + '/bookmarks/add/?object_id=' + id + '&object_type=11" id="SP_PLUS_INFAV" class="list-link list-link_arrow list-link_first"><span class="sp sp-fav"></span> Добавить в закладки<span class="ico ico_arr"></span></a></span>' : '') + '<a href="' + _PROTOCOL + '//' + _DOMAIN + '/gifts/user_list/?user=' + nick + '" class="list-link list-link_arrow list-link_first"><span class="ico ico_gifts_blue"></span> Подарки<span class="ico ico_arr"></span></a>' + (!blocked ? '<a href="' + _PROTOCOL + '//' + _DOMAIN + '/guestbook/?name=' + nick + '" class="list-link list-link_arrow list-link_first"><span class="ico ico_gb"></span> Гостевая<span class="ico ico_arr"></span></a><a href="' + _PROTOCOL + '//' + _DOMAIN + '/diary/?name=' + nick + '" class="list-link list-link_arrow"><span class="ico ico_blog"></span> Личный блог<span class="ico ico_arr"></span></a>' : '') + '<a href="' + _PROTOCOL + '//' + _DOMAIN + '/forums/search_user/?Comm=0&Ext=1&Link_id=363467&query=' + nick + '" class="list-link list-link_arrow"><span class="ico ico_forum"></span> Темы и комментарии <span class="ico ico_arr"></span></a>' + (!blocked ? '<div class="sep-item"></div><a href="' + _PROTOCOL + '//' + _DOMAIN + '/pictures/?P=1&amp;name=' + nick + '" class="list-link list-link_arrow"><span class="ico ico_photo"></span> Фотографии<span class="ico ico_arr"></span></a><a href="' + _PROTOCOL + '//' + _DOMAIN + '/music/?P=1&amp;name=' + nick + '" class="list-link list-link_arrow"><span class="ico ico_music"></span> Музыка<span class="ico ico_arr"></span></a><a href="' + _PROTOCOL + '//' + _DOMAIN + '/video/?P=1&amp;name=' + nick + '" class="list-link list-link_arrow"><span class="ico ico_video"></span> Видео<span class="ico ico_arr"></span></a><a href="' + _PROTOCOL + '//' + _DOMAIN + '/files/?P=1&amp;name=' + nick + '" class="list-link list-link_arrow"><span class="ico ico_file"></span> Файлы<span class="ico ico_arr"></span></a>' : '') + '<div class="sep-item"></div><a href="' + _PROTOCOL + '//' + _DOMAIN + '/comm/?List=1&user=' + nick + '" class="list-link list-link_arrow"><span class="ico ico_comm"></span> Сообщества<span class="ico ico_arr"></span></a><a href="' + _PROTOCOL + '//' + _DOMAIN + '/friends/?name=' + nick + '&amp;p=1" class="list-link list-link_arrow"><span class="ico ico_friends"></span> Друзья<span class="ico ico_arr"></span></a><a href="' + _PROTOCOL + '//' + _DOMAIN + '/lenta/readers/?user=' + nick + '" class="list-link list-link_arrow"><span class="ico ico_readers"></span> Читатели<span class="ico ico_arr"></span></a></div>' : '<div class="no_underline_block start_page_padd light_border_bottom" style="padding-top:1px;">' + (id ? '<div id="SP_PLUS_INFAV"><a href="' + _PROTOCOL + '//' + _DOMAIN + '/bookmarks/add/?object_id=' + id + '&object_type=11"><img src="' + _PROTOCOL + '//spac.me/i/action_fav_gray.gif" alt="" class="m p16"> <span class="m"> Добавить в закладки</span></a></div>' : '') + '<div><a href="' + _PROTOCOL + '//' + _DOMAIN + '/gifts/user_list/?user=' + nick + '"><img src="' + _PROTOCOL + '//spac.me/i/sendgift.gif" alt="" class="m p16"> <span class="m">Подарки</span></a></div>' + (!blocked ? '<div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/guestbook/?name=' + nick + '&amp;p=0"><img src="' + _PROTOCOL + '//spac.me/i/guestbook.gif" alt="" class="m p16"> <span class="m">Гостевая</span></a></div><div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/diary/?name=' + nick + '"><img src="' + _PROTOCOL + '//spac.me/i/diary.gif" alt="" class="m p16"> <span class="m">Блог</span></a></div>' : '') + '</div><div class="no_underline_block start_page_padd light_blue light_border_bottom">' + (!blocked ? '<div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/pictures/?P=1&amp;name=' + nick + '"><img src="' + _PROTOCOL + '//spac.me/i/PhotoIcon.gif" alt="" class="m p16"> <span class="m">Фото</span></a></div><div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/music/?P=1&amp;name=' + nick + '"><img src="' + _PROTOCOL + '//spac.me/i/file_mp3.gif" alt="" class="m p16"> <span class="m">Музыка</span></a></div><div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/video/?P=1&amp;name=' + nick + '"><img src="' + _PROTOCOL + '//spac.me/i/icon_video.gif" alt="" class="m p16"> <span class="m">Видео</span></a></div><div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/files/?P=1&amp;name=' + nick + '"><img src="' + _PROTOCOL + '//spac.me/i/film.gif" alt="" class="m p16"> <span class="m">Файлы</span></a></div>' : '') + '<div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/forums/search_user/?Comm=0&Ext=1&word=' + nick + '"><img src="' + _PROTOCOL + '//spac.me/i/Forum.gif" alt="" class="m p16"> <span class="m">Темы и комментарии</span></a> </div></div><div class="no_underline_block start_page_padd light_border_bottom"><div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/friends/?name=' + nick + '"><img src="' + _PROTOCOL + '//spac.me/i/friends.gif" alt="" class="m p16"> <span class="m">Друзья</span></a></div><div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/comm/?List=1&user=' + nick + '"> <img src="' + _PROTOCOL + '//spac.me/i/soo.gif" alt="" class="m p16"> <span class="m">Сообщества</span></a></div><div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/lenta/readers/?user=' + nick + '"><img src="' + _PROTOCOL + '//spac.me/i/icon_readers.gif" alt="" class="m p16"> <span class="m">Читатели</span></a></div></div>';
+            bannedHTML: function(nick, type, blocked) {
+                var out = type ? '<div class="widgets-group links-group"><a href="' + _PROTOCOL + '//' + _DOMAIN + '/gifts/user_list/?user=' + nick + '" class="list-link list-link_arrow list-link_first"><span class="ico ico_gifts_blue"></span> Подарки<span class="ico ico_arr"></span></a>' + (!blocked ? '<a href="' + _PROTOCOL + '//' + _DOMAIN + '/guestbook/?name=' + nick + '" class="list-link list-link_arrow list-link_first"><span class="ico ico_gb"></span> Гостевая<span class="ico ico_arr"></span></a><a href="' + _PROTOCOL + '//' + _DOMAIN + '/diary/?name=' + nick + '" class="list-link list-link_arrow"><span class="ico ico_blog"></span> Личный блог<span class="ico ico_arr"></span></a>' : '') + '<a href="' + _PROTOCOL + '//' + _DOMAIN + '/forums/search_user/?Comm=0&Ext=1&Link_id=363467&query=' + nick + '" class="list-link list-link_arrow"><span class="ico ico_forum"></span> Темы и комментарии <span class="ico ico_arr"></span></a>' + (!blocked ? '<div class="sep-item"></div><a href="' + _PROTOCOL + '//' + _DOMAIN + '/pictures/?P=1&amp;name=' + nick + '" class="list-link list-link_arrow"><span class="ico ico_photo"></span> Фотографии<span class="ico ico_arr"></span></a><a href="' + _PROTOCOL + '//' + _DOMAIN + '/music/?P=1&amp;name=' + nick + '" class="list-link list-link_arrow"><span class="ico ico_music"></span> Музыка<span class="ico ico_arr"></span></a><a href="' + _PROTOCOL + '//' + _DOMAIN + '/video/?P=1&amp;name=' + nick + '" class="list-link list-link_arrow"><span class="ico ico_video"></span> Видео<span class="ico ico_arr"></span></a><a href="' + _PROTOCOL + '//' + _DOMAIN + '/files/?P=1&amp;name=' + nick + '" class="list-link list-link_arrow"><span class="ico ico_file"></span> Файлы<span class="ico ico_arr"></span></a>' : '') + '<div class="sep-item"></div><a href="' + _PROTOCOL + '//' + _DOMAIN + '/comm/?List=1&user=' + nick + '" class="list-link list-link_arrow"><span class="ico ico_comm"></span> Сообщества<span class="ico ico_arr"></span></a><a href="' + _PROTOCOL + '//' + _DOMAIN + '/friends/?name=' + nick + '&amp;p=1" class="list-link list-link_arrow"><span class="ico ico_friends"></span> Друзья<span class="ico ico_arr"></span></a><a href="' + _PROTOCOL + '//' + _DOMAIN + '/lenta/readers/?user=' + nick + '" class="list-link list-link_arrow"><span class="ico ico_readers"></span> Читатели<span class="ico ico_arr"></span></a></div>' : '<div class="no_underline_block start_page_padd light_border_bottom" style="padding-top:1px;"><div><a href="' + _PROTOCOL + '//' + _DOMAIN + '/gifts/user_list/?user=' + nick + '"><img src="' + _PROTOCOL + '//spac.me/i/sendgift.gif" alt="" class="m p16"> <span class="m">Подарки</span></a></div>' + (!blocked ? '<div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/guestbook/?name=' + nick + '&amp;p=0"><img src="' + _PROTOCOL + '//spac.me/i/guestbook.gif" alt="" class="m p16"> <span class="m">Гостевая</span></a></div><div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/diary/?name=' + nick + '"><img src="' + _PROTOCOL + '//spac.me/i/diary.gif" alt="" class="m p16"> <span class="m">Блог</span></a></div>' : '') + '</div><div class="no_underline_block start_page_padd light_blue light_border_bottom">' + (!blocked ? '<div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/pictures/?P=1&amp;name=' + nick + '"><img src="' + _PROTOCOL + '//spac.me/i/PhotoIcon.gif" alt="" class="m p16"> <span class="m">Фото</span></a></div><div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/music/?P=1&amp;name=' + nick + '"><img src="' + _PROTOCOL + '//spac.me/i/file_mp3.gif" alt="" class="m p16"> <span class="m">Музыка</span></a></div><div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/video/?P=1&amp;name=' + nick + '"><img src="' + _PROTOCOL + '//spac.me/i/icon_video.gif" alt="" class="m p16"> <span class="m">Видео</span></a></div><div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/files/?P=1&amp;name=' + nick + '"><img src="' + _PROTOCOL + '//spac.me/i/film.gif" alt="" class="m p16"> <span class="m">Файлы</span></a></div>' : '') + '<div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/forums/search_user/?Comm=0&Ext=1&word=' + nick + '"><img src="' + _PROTOCOL + '//spac.me/i/Forum.gif" alt="" class="m p16"> <span class="m">Темы и комментарии</span></a> </div></div><div class="no_underline_block start_page_padd light_border_bottom"><div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/friends/?name=' + nick + '"><img src="' + _PROTOCOL + '//spac.me/i/friends.gif" alt="" class="m p16"> <span class="m">Друзья</span></a></div><div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/comm/?List=1&user=' + nick + '"> <img src="' + _PROTOCOL + '//spac.me/i/soo.gif" alt="" class="m p16"> <span class="m">Сообщества</span></a></div><div> <a href="' + _PROTOCOL + '//' + _DOMAIN + '/lenta/readers/?user=' + nick + '"><img src="' + _PROTOCOL + '//spac.me/i/icon_readers.gif" alt="" class="m p16"> <span class="m">Читатели</span></a></div></div>';
                 return out;
             },
             bannedTools: function() {
@@ -2074,7 +2039,6 @@
                                         var json = main.extend(_json, JSON.parse(res));
                                         if (json.owner_widget.ban_info && json.owner_id && sContent) {
                                             var blckg = false;
-                                            var uid = json.owner_id;
                                             var bl = json.owner_widget.ban_info.in_blacklist_result;
                                             if (json.owner_widget.ban_info.deleted) {
                                                 main.console.info("[S+] Аккаунт удален!");
@@ -2096,17 +2060,14 @@
                                             var tBlock = btools || main.ce("div", {
                                                 id: "SP_PLUS_BNDBLOCK"
                                             });
-                                            tBlock.innerHTML = main.bannedHTML(nick, type, blckg, uid);
+                                            tBlock.innerHTML = main.bannedHTML(nick, type, blckg);
                                             if (!btools) {
                                                 sContent.appendChild(tBlock);
-                                            }
-                                            if (uid) {
-                                                main.isFav(uid, main.qs("#SP_PLUS_INFAV"), nick, (type ? '<span class="sp sp-fav-on"></span> Удалить из закладок<span class="ico ico_arr"></span>' : '<img src="' + _PROTOCOL + '//spac.me/i/action_fav_color.gif" alt="" class="m p16"> <span class="m"> Удалить из закладок</span>'));
                                             }
                                         }
                                     }
                                 } catch (e) {
-                                    main.console.error('Ошибка (JSON_BLOCKED): ' + e.name + ":" + e.message + "\n" + e.stack);
+                                    main.console.error('Ошибка (JSON-BLOCKED): ' + e.name + ":" + e.message + "\n" + e.stack);
                                 }
                             });
                         }
@@ -2306,15 +2267,15 @@
                                 for (i = 0; i < chbxArr.length; i++) {
                                     chbxArr[i].style.display = "none";
                                 }
-                                var btnDiv = main.ce("div", {
+                                var btnDivNone = main.ce("div", {
                                     style: "display: none;",
                                     id: "SP_PLUS_BOTTOM_DIVB"
                                 });
-                                document.body.appendChild(btnDiv);
+                                document.body.appendChild(btnDivNone);
                             }
                         }
                     } catch (e) {
-                        main.console.error('Ошибка (READERS_DELETE): ' + e.name + ":" + e.message + "\n" + e.stack);
+                        main.console.error('Ошибка (READERS-DELETE): ' + e.name + ":" + e.message + "\n" + e.stack);
                     }
                 }
             },
@@ -2326,7 +2287,6 @@
                         var edLinks = main.find(document.links, {
                             href: _PROTOCOL + "//" + _DOMAIN + "/diary/editaccess/?Link_id="
                         });
-                        console.log(edLinks)
                         if (edLinks && !main.qs("#SP_PLUS_BOTTOM_DIVB")) {
                             var CK = main.getCK(0);
                             var chbxArr = new Array();
@@ -2418,15 +2378,15 @@
                                 for (var i = 0; i < chbxArr.length; i++) {
                                     chbxArr[i].style.display = "none";
                                 }
-                                var btnDiv = main.ce("div", {
+                                var btnDivNone = main.ce("div", {
                                     style: "display: none;",
                                     id: "SP_PLUS_BOTTOM_DIVB"
                                 });
-                                document.body.appendChild(btnDiv);
+                                document.body.appendChild(btnDivNone);
                             }
                         }
                     } catch (e) {
-                        main.console.error('Ошибка (BLOGS_DELETE): ' + e.name + ":" + e.message + "\n" + e.stack);
+                        main.console.error('Ошибка (BLOGS-DELETE): ' + e.name + ":" + e.message + "\n" + e.stack);
                     }
                 }
             },
@@ -2468,7 +2428,7 @@
                         return false;
                     }
                     return true;
-                }
+                };
                 var Main = main.qs("#SP_PLUS_CONFIRM");
                 if (!Main) {
                     Main = main.ce("div", {
@@ -2547,13 +2507,13 @@
                                             class: "sp-cbfc sp-checkbox-square",
                                             id: "DC_" + childs[k].parentNode.parentNode.parentNode.parentNode.parentNode.id
                                         });
-                                        var ckbxlb = main.ce("label", {
+                                        var ckbxlb2 = main.ce("label", {
                                             attr: {
                                                 "for": "DC_" + childs[k].parentNode.parentNode.parentNode.parentNode.parentNode.id
                                             }
                                         });
                                         childs[k].appendChild(ckbx);
-                                        childs[k].appendChild(ckbxlb);
+                                        childs[k].appendChild(ckbxlb2);
                                     }
                                     if (k == (childs.length - 1) && !refDiv) {
                                         refDiv = childs[k].parentNode.parentNode.parentNode.parentNode;
@@ -2652,7 +2612,7 @@
                         commentsLength = 0;
                     }
                 } catch (e) {
-                    main.console.error('Ошибка (COMMENTS_DELETE): ' + e.name + ":" + e.message + "\n" + e.stack);
+                    main.console.error('Ошибка (COMMENTS-DELETE): ' + e.name + ":" + e.message + "\n" + e.stack);
                 }
             },
             playerDown: function() {
@@ -2688,7 +2648,7 @@
                     if (downPlace) {
                         main.remove(downPlace);
                     }
-                    main.console.error('Ошибка (PLAYER_DOWN): ' + e.name + ":" + e.message + "\n" + e.stack);
+                    main.console.error('Ошибка (PLAYER-DOWN): ' + e.name + ":" + e.message + "\n" + e.stack);
                 }
             },
             coinsAccept: function() {
@@ -2724,7 +2684,19 @@
                 var reklama = main.find(document.links, {
                     title: "Реклама"
                 });
+                var tracker = main.find(document.getElementsByTagName('img'), {
+                    src: "mobiads_plank_big.png"
+                });
+                var xbet = main.find(document.getElementsByTagName('a'), {
+                    href: "https://tracker.ma-static.ru/tracker.php"
+                });
                 try {
+                    if (tracker) {
+                        main.remove(tracker[0].parentNode.parentNode.parentNode.parentNode);
+                    }
+                    if (xbet) {
+                        main.remove(xbet[0].parentNode);
+                    }
                     if (!s) {
                         var script = main.ce("script", {
                             type: "text/javascript",
@@ -2757,106 +2729,53 @@
                     plenta.appendChild(mail[0]);
                 }
             },
-            darkMode: function(t) {
-                var parent = document.getElementsByTagName('head').item(0);
-                var sdm = main.qs("#SP_PLUS_DARKMODE") || main.ce("style", {
-                    id: "SP_PLUS_DARKMODE",
-                    type: "text/css"
-                });
+            apiDebugger: function() {
+                var script = main.qs("#spaces_api_debugger");
                 try {
-                    if (sdm && !sdm.hasAttribute("sp-darkmode") && t) {
-                        sdm.innerHTML = ".border{border:1px solid #344047!important}.sp_plus_checkbox_radio+label{color:#fff!important}input[type=range]{background:transparent;height:0;-webkit-appearance:none;margin:10px 0;width:100%}input[type=range]:focus{outline:0}input[type=range]::-webkit-slider-runnable-track{width:100%;height:10px;cursor:pointer;animate:.2s;background:#9ab2cc!important;border-radius:32px;border:0 solid #000}input[type=range]::-webkit-slider-thumb{border:0 solid #2497e3;height:10px;width:10px;border-radius:4px;background:#9ab2cc!important;cursor:pointer;-webkit-appearance:none;margin-top:0}input[type=range]:focus::-webkit-slider-runnable-track{background:#d2e3f4}input[type=range]::-moz-range-track{width:100%;height:10px;cursor:pointer;animate:.2s;background:#d2e3f4;border-radius:32px;border:0 solid #000}input[type=range]::-moz-range-thumb{border:0 solid #2497e3;height:10px;width:10px;border-radius:4px;background:#9ab2cc!important;cursor:pointer}input[type=range]::-ms-track{width:100%;height:10px;cursor:pointer;animate:.2s;background:0;border-color:transparent;color:transparent}input[type=range]::-ms-fill-lower{background:#d2e3f4;border:0 solid #000;border-radius:64px}input[type=range]::-ms-fill-upper{background:#d2e3f4;border:0 solid #000;border-radius:64px}input[type=range]::-ms-thumb{margin-top:1px;border:0 solid #2497e3;height:10px;width:10px;border-radius:4px;background:#9ab2cc!important;cursor:pointer}input[type=range]:focus::-ms-fill-lower{background:#d2e3f4}input[type=range]:focus::-ms-fill-upper{background:#d2e3f4}input[type=range]::-moz-range-progress{border-radius:4px;height:10px;background-color:#9ab2cc!important}input[type=range]::-ms-fill-lower{border-radius:4px;height:10px;background-color:#9ab2cc!important}.brdtop{border-top:1px solid #344047!important}.adv_user_link{background:#404a51!important;border:unset}.grey{color:#fff}.light_item{color:#7a90a0!important}.about_separator::before{border-bottom:1px solid #404a51}.about_separator>span{color:#fff!important;background:#404a51}.error__item .text-input_error{background:unset}.lgrey{color:#fff}body .user__tools-link_disabled,body .user__tools-link_disabled:hover,body .user__tools-link_disabled.clicked,body .stnd-link_disabled:active,.dropdown-menu .list-link.user__tools-link_disabled,.dropdown-menu .list-link.user__tools-link_disabled:hover{cursor:not-allowed;background:unset!important}.s-city__pagination-btn:hover{background:#596671}.s-city__pagination{background:#4d5961!important}.calendar-head{background-color:#344047}.mailBox{border:1px solid #344047!important;background:#4d5961!important}.mailBox .text{color:#fff!important}.message-block_foreign.message-block_personal .message__description::before{border-right-color:#61a961}.message__date,.message__place{color:#fff}.message-block_personal .message__description{background:#61a961}.message-block_foreign.message-block_system .message__description::before{border-right-color:#344047}.message-block_my.message-block_system .message__description,.message-block_system .message__description{background:#344047}.message__user,.message__text{color:#fff}.message-block_foreign .message__description::before{border-right-color:#344047}.message__description{background:#344047}.message-block_my .message__description::before{border-left-color:#404a51}.message-block_my .message__description{background:#404a51}.list-link_sep{border:1px solid#344047}.bordered{border:1px solid#344047}.cnt_title{border-color:#4d5961!important;color:#57a3ea}.s-property::after{content:unset!important}.s-property::before{background:transparent}.s-property__inner{border:1px solid #344047}.s-property{background:#4d5961}.switch__item_cnt{color:#64a3eb}.switch{background:unset}.system-message_service{color:#404a51!important;background:#f9edbf!important}.system-message{border-right:1px solid #344047;color:#fff;background:#4d5961}.time-block{background:#4d5961;border:1px solid #344047;border-top:unset}.i_busi{color:#000}content-item{background:#4d5961}.un,#scroll_page_toTop,#scroll_page_toBottom{color:#fff}label.user__tools-link.clicked{background:#4d5961!important}.user__tools-link:active,.user-tile__btn:active,.user-tile__btn.js-clicked,.user__tools-link.clicked{color:#fff!important}.colorpicker-spectrum_cursor{background:#344047}.colorpicker-color,.colorpicker-rect,.colorpicker-spectrum,.toolbar-color,.colorpicker-spectrum_cursor{border:1px solid #344047}#scroll_page_place{background:#344047}a.link-blue:hover{color:#00a5ed!important}.gp-right_btn .gp-content{background-color:#404a51}.gp-right_btn .gp-content:hover{background:#818f99}.gp-right_btn .gp-active .gp-content{background:#344047}body,#main_wrap{color:#fff}.warning,.code_tag{background:#404a51;border:1px solid #333f45}.text_input,.friends_access_list,.button_block input,.form_button{border:1px solid #344047}.attach_block{background:#4d5961}.link_active,.item_clicked,.strong_clicked,.clicked .stnd-link,.stnd-link:active,.list-link-blue.clicked,body .stnd-link_active,.links-group .sublink .list-link:active,.links-group .stnd-link_arr.list-link-blue:active{color:#fff!important}.tabs__item:hover .tabs__link{color:#fff;background:#596671}.w_ava .mail__dialog_message::before{border-right-color:#404a51}.w_ava .mail__dialog_answer::before{border-right-color:#344047}.block-item__online{color:#31bf0f}.lenta_item,.poll_block{border:1px solid #344047}.att_size{color:#57a3ea}.mail__dialog_wrapper .blog-item_short_shared,.mail__dialog_wrapper .att_wrap{border:1px solid #344047}.error__item.list-link{border-bottom:1px solid #344047}.gallery_fileselector .gallery__image-wrapper{background:#404a51}.perimeter-border{border:1px solid #344047}.sp_btn_line{border-right:1px solid #344047!important}.btn-tools_centered .icon-link{border:1px solid #344047!important}.sp_plus_alert_y{border:1px solid #344047!important;background:#4d5961!important;color:#fff!important;-webkit-box-shadow:0 3px 5px #293238!important;-moz-box-shadow:0 3px 5px #293238!important;box-shadow:0 3px 5px #293238!important}#copy_url{color:#888}.sv b,.site-versions b{color:#fff}#sandbox_indicator{background:#4d5961 none repeat scroll 0 0!important;color:#a4b7c4}#page_counters>div{background-color:#404a51!important}#copy_url{background:#404a51!important}.bottom_fix{background:#404a51}.karma__plus,.karma__minus{border-bottom:1px solid #344047!important}.pc .mail__msg_checked:hover,.pc .mail__msg_checked.mail__new_msg:hover,.pc .mail__msg_checked.mail__new_msg_bg:hover,.mail__msg_checked{background:#344047!important}.location-bar a:hover{color:#fff}.bstrwrap{border-top:1px solid #344047!important}.stnd-block-yellow{background:#f9edbf!important}.content-bl__sep3{border-bottom:unset}.triangle-show.js-clicked::after{border-bottom-color:#344047}.dropdown-menu_top .table__cell .js-clicked::after{border-top-color:#344047}.table__cell .clicked::after{border-bottom-color:#344047}.table_cell_border{border-right:1px solid #344047!important}.btn-tools.js-clicked::after{border-bottom-color:#344047}.user__change-btn.js-clicked::after{border-bottom-color:#344047}.tabs .clicked .tabs__link::after{border-top-color:#344047}.triangle-show.triangle-block::after,.triangle-show.triangle-block::before{border-bottom-color:#344047}.action-bar-info .triangle-show::after{border-bottom-color:#404a51}.link_top-border{border-top:1px solid #344047}.f__title{color:#fff}.b-title_in-window{background:#4d5961!important;color:#fff}button,input[type='button'],input[type='submit'],input[type='reset'],.button{border:1px solid #344047;background:#4d5961}button:hover,input[type='button']:hover,input[type='submit']:hover,input[type='reset']:hover,.button:hover{background-color:#818f99}.sp_plus_line>span{background:#404a51!important}.sp_plus_line::before{border-bottom:1px solid #344047!important}.sp_plus_text{color:#7a90a0!important}div.main{border-left:1px solid #344047;border-right:1px solid #344047}.s_title{background:unset}#left_nav ul li.li{border-top:unset;border-bottom:unset}.location-bar a::after,.location-bar__title::after,.location-bar_no-break::after{background:unset}.carousel-bg{border-bottom:1px solid #344047}a.region_link:visited,.author_settings,a.region_link,.t-strong_special .gr{color:#57a3ea!important}.smiles_menu-back{border-top:1px solid #344047}.smiles_menu-header{background:#344047}.smiles_menu{border:1px solid #344047}.smiles_menu-body{background:#4d5961}.busi_switcher table .active_item,.busi_switcher table a:active{background:#4d5961}.busi_switcher table a,.busi_switcher table span.active_item{text-shadow:unset}.busi_switcher table a,.busi_switcher table span.active_item{border:1px solid #344047}.file_name,.search_bar,.more_link,.list_item,.edit_title_block,.busi_switcher table a,.edit_button{background:#344047}.busi_switcher table a:hover{background:#4d5961}.light_blue_bg{color:#fff}.vlight_border_bottom{border-bottom:1px solid #344047}.bubble-message{color:#fff}.text-block5,.text-block6,.text-block7{color:#fff}.replace_widget_wrapper+.list-link,.replace_widget_wrapper+.content-item3{border-top:1px solid #344047}.list-link__more-users{background:#404a51;color:#fff}.toolbar__wrap{background:unset}.stnd-block.error__msg{background:unset}.tile{background:#344047;color:#fff}.select_custom{color:#fff}.cnt-link:focus{color:#fff;background:#5b676f}.cnt-link:hover{background:#5b676f}.hover_bg:hover{background:#818f99}.suggest__item{background:#434b5a}a.service_link,a.service_link span,.service_item{color:#fff}.t-link_no_underline_block,.t-link_no_underline_block:hover{color:#fff}.t-link_no_underline:hover,.t-link_no_underline:hover span,.t-link_no_underline_block:hover .t-link_item_hover{color:#57a3ea}a.region_link:hover,.ewb:hover span,a.title_link:hover span,a.grey_link:hover,span.grey_link a:hover,.list_item div a:hover,.author_link:hover,.edit_label a:hover,a.user_link:hover,a.service_link:hover,a.service_link:hover span,.busi a:hover,a.arrow_link:hover span,.pag .pgar .page:hover,.edit_link,.sub_menu a:hover,a.icolink:hover,.neutral_link span,.tools_block a:hover,.url-btn-blue:hover,.file_comments_info a:hover,.sub_block a:hover,a.name_link:hover,.response:hover,.green_box a:hover span,.ufi a:hover span,.ufi a:hover{color:#57a3ea!important}a.region_link:hover,.ewb:hover span,a.title_link:hover,a.title_link:hover span,a.grey_link:hover,span.grey_link a:hover,.list_item div a:hover,.author_link:hover,.edit_label a:hover,a.user_link:hover,a.service_link:hover,a.service_link:hover span,.busi a:hover,a.arrow_link:hover span,.pag .pgar .page:hover,.edit_link,.sub_menu a:hover,a.icolink:hover,.neutral_link span,.tools_block a:hover,.url-btn-blue:hover,.file_comments_info a:hover,.sub_block a:hover,a.name_link:hover,.response:hover,.green_box a:hover span,.ufi a:hover span,.ufi a:hover{color:#57a3ea}.tab_title{color:#fff}.table__cell_last,.table_no_borders .table__cell{border-right:unset!important}.service_links_block_top,.pad_t_a{border-top:unset!important}.block-item__btn-wrap>div>a{border:1px solid #344047}.spo_desc{color:#57a3ea}a.red_link,a.red_link span,.red_item{color:red}.light_border_top{border-top:1px solid #344047}.text-input[readonly]{background:unset!important}.stnd-link,.stnd-block{color:#fff}.tabs_line{border-top:1px solid #344047}.tabs_block a:hover{background:#818f99}.tabs_block .tab_item{border:1px solid #344047;background:#404a51;color:#fff}.tabs_block .tab_active,.tabs_block .tab_active:hover{background:#4d5961!important;color:#fff}.list_item{background:#4d5961!important}.bottom_link_block,.search_bar,div.backlink,body .blue_bg{background:#4d5961}.user__tools_horiz-mode{border:1px solid #344047}.form-checkbox_w_descr .form-checkbox__label{color:#fff}.content-item_info{color:#344047!important}.sp_plus_checkbox_el+label{color:#fff!important}.chb-icons .ico_photo,.ico_photo_gray{background-position:-288px -180px!important}.sep-chb .form-checkbox,.form-checkbox_dropdown-menu{background:#4d5961;border-bottom:1px solid #344047}.drop-down-list_inner .drop-down-label{background:unset}.darkblue{color:#fff}.text-block7{color:#fff}.normal-stnd{color:#fff}.list-link:hover,.me6d43f28:hover,.list-link__wrap_hover .list-link,.tabs__item:hover,.btn-main:hover,.btn-block:hover,.user__tools-link:hover,a.user__tools-link:hover,.user-tile__btn:hover,a.hover-item:hover,.tile__bottom-link:hover,.btn-link:hover,.stnd-link:hover,.s-city__item:hover,.s-chb:hover,a:hover .bordered,.pgn__link_hover:hover,.links-group_grey .list-link.strong_clicked,.form-checkbox_dropdown-menu:hover,.dropdown-menu .list-link:hover,.dropdown-menu .list-link__wrap_hover .list-link{background:#596671!important}.gp-active .gp-content{background-color:#344047}#gp_playlist{background:#4d5961}#gp_window{border:unset}.att_wrap{background:#404a51}.quote,.blog-item_short_shared{background:#596771;color:#fff;border:1px solid #344047}.links-group .stnd-link,.links-group .list-link_arrow{border-bottom:1px solid #344047}.soc-separator{background:#4d5961}.sub-tabs{background:#4d5961}.message{background:#4d5961}.table__cell_block{background:#4d5961}.light_blue{background:#404a51}.user__tools-link{color:#fff!important}.flot-text{color:#fff!important}.site-link__wrapper{border-bottom:1px solid #344047}.stnd-link_profile,.stnd-block_profile{color:#7a90a0!important}.pgn__go,.pgn__go:hover{background-position:-396px -306px!important}.pgn__search_input:focus{background:#4d5961}.blue_border_bottom{border-bottom:1px solid #344047}.light_blue_bg{background:#404a51;border-bottom:1px solid #344047}.t-padd_right{padding-right:unset}#e0437eeb07,.pag,.search_bar,.bottom_link_block,.list_item,.button_block,.title_block,.sub_menu,.strong_border{border-bottom:1px solid #344047}.blue_wrap_block{background:#404a51}.pgn-wrapper .pgn{border-top:1px solid #344047}.sup_block{background:#4d5961}#main_shadow,#top_info_block{border-left:1px solid #344047}.list-link_online{color:#fff!important}.ico_services{background:url(https://" + gitPages + "/src/darkmode/ico_services.png) no-repeat}.ico_services_nick{background-position:0 -34px}.ico_services_stickers{background-position:-34px -34px}.ico_services_ads{background-position:0 0}.ico_services_nick{background-position:0 -34px}.ico_services_ghost{background-position:-34px 0}.ico_services_storage{background-position:-68px 0}.ico_services_head_icons{background-position:-68px -34px}.ico{background:url(https://" + gitPages + "/src/darkmode/ico.png) no-repeat}.ico_history_blue{background-position:-306px -18px}.ico_history_black,a:hover .ico_history_blue,a:active .ico_history{background-position:-306px -18px}.ico_info_b{background-position:-136px -146px}.ico_sites_b{background-position:-200px -102px}.ico_dating_b{background-position:-166px -102px}.clicked .ico_man{background-position:-288px -364px}.clicked .ico_woman{background-position:-324px -364px}.list-link:hover .ico_info{background-position:-234px -180px}.ico_lock_darkblue{background-position:-378px -126px}.inl-link .ico_arr{background-position:-414px -385px}.link-blue .ico_arr{background-position:-414px -385px!important}.link-stnd:hover .ico_arr7,.nl a:hover .ico_arr,.ico_arr8,.link-imp .ico_arr,.link-blue .ico_arr,.inl-link:hover .ico_arr{background-position:-414px -385px}.ico_forum_darkblue{background-position:-126px -274px}.ico_diary_darkblue{background-position:-288px 0}.ico_key_white{background-position:-378px 0}a:active .ico_exit,.link_active .ico_exit,a:active .ico_exit_blue{background-position:-306px -54px!important}.ico_photo_selected{background-position:-136px -112px}.ico_ac_all{background-position:-306px -310px}.ico_photo_select{background-position:-170px -146px}.ico_mode_na{background-position:-360px -72px}.ico_rate_up{background-position:-80px -198px}.ico_demo{background-position:-414px -130px}.ico_ban_list{background-position:-180px -310px}.ico_darr_left{background-position:-90px -364px}.ico_question_light{background-position:-234px -144px}.ico_ok,.ico_ok_green{background-position:-252px -108px!important}.ico_darr_right{background-position:-108px -364px}.ico_rotate_left{background-position:-54px -364px}.ico_rotate_right{background-position:-72px -364px}.ico_note{background-position:-198px -364px}.ico_ok_grey{background-position:-18px -364px}.ico_speaker{background-position:-72px -256px}.ico_close_btn_invers{background-position:0 -198px}.ico_locked{background-position:-378px -36px}.ico_status{background-position:-128px -180px}.ico_read_blue{background-position:-270px -292px}.ico_place{background-position:-396px -162px}.ico_arr4{background-position:-414px -321px}.ico_att{background-position:-144px -310px}.ico_mess,.chb-icons .form-checkbox_checked .ico_mess{background-position:-198px -274px}.ico_more_b{background-position:-54px -292px}.ico_no_results{background-position:-34px -146px}.ico_users_blue{background-position:-162px -328px}.ico_shared_grey{background-position:-198px -220px}.ico_shared_darkblue{background-position:-252px -18px}.ico_ac_all_grey,.drop-down-list_inner .drop-down-label .ico_ac_all{background-position:-324px -310px}.ico_filter{background-position:-396px -198px}.ico_search_people_blue{background-position:-378px -198px}.ico_mode_froffr{background-position:-71px -180px}.ico_delete_g{background-position:-324px -180px}.ico_plane_blue{background-position:-288px -310px}.ico_alert{background-position:-216px -364px}.ico_people_darkblue{background-position:-378px -270px}.ico_locked_large{background-position:-68px -146px}.ico_a{background-position:-126px -364px}.ico_plus_blue{background-position:-324px -270px}.ico_ac_group{background-position:-54px -328px}.ico_ac_password{background-position:-342px -288px}.ico_eye{background-position:-252px -310px}.ico_ac_fof,.ico_ac_fof_black,.ico_ac_fof_darkblue{background-position:-342px -198px}.ico_ac_friends{background-position:-342px -126px}.ico_ac_user{background-position:-342px -36px}.ico_mode_fronl{background-position:-162px -256px}.ico_extended,.ico_extended_on,.ico_extended_off{background-position:-396px -342px}.ico_short,.ico_short_on,.ico_short_off{background-position:-396px -324px}.ico_mobile_blue{background-position:-324px -126px}.ico_mail_blue{background-position:-324px -108px}.ico_enter_grey,body a.stnd-link_disabled .ico_enter_grey{background-position:-306px -144px}a.inl-link:hover .ico_shared_darkblue,.ico_shared_blue{background-position:-252px -18px}.ico_checked{background-position:-180px -364px}.ico_upload_blue{background-position:-396px -90px}.ico_shared_white{background-position:-198px -220px}.ico_befriends_blue{background-position:-144px -292px}.ico_ac_friends_darkblue,.ico-menu-toggle.js-clicked .ico_ac_friends,.drop-down-label.js-clicked .ico_ac_friends_black{background-position:-378px -270px}.ico_delete{background-position:-180px -256px}.ico_rate_down{background-position:-324px -72px}.ico_close_btn{background-position:-22px -198px}.ico_enter_blue{background-position:-306px -126px}.ico_add_darkblue{background-position:-396px -54px}.ico_profile,.ico_edit_dim{background-position:0 -292px}.site-link__wrapper{background:#4d5961}.ico_service_b{background-position:-200px -34px}.ico_career_b{background-position:-200px -68px}.ico_high_b{background-position:-102px -146px}.ico_ed_b{background-position:-132px 0}.ico_up{background-position:-360px 0}.ico_down{background-position:-360px -36px}.ico_plane{background-position:-234px -292px}.ico_read_on{background-position:-324px -18px}.ico_ac_fof_darkblue,.ico-menu-toggle.js-clicked .ico_ac_fof,.drop-down-label.js-clicked .ico_ac_fof_black{background-position:-342px -234px}.ico_edit_b,a:hover .ico_edit_darkblue,a:hover .no-text .ico_profile,.link-normal:hover .ico_profile,.inline-link:hover .ico_edit_dim,.link-grey:hover .ico_edit_dim,.link-dim:hover .ico_edit_dim{background-position:-324px -216px}.block-item{border-bottom:1px solid #344047;background:#4d5961!important}.ico_main_b{background-position:-200px -136px}.ico_befriends{background-position:-378px -288px}.ico_man{background-position:-288px -364px}.ico_woman{background-position:-324px -364px}.user__tools_horiz-mode .table__cell{border-right:1px solid #344047}.text-input:focus{background:#4d5961}.ico_compass{background-position:-166px -68px}.s-city__item_light:active,.s-city__item_light.clicked{color:#fff}.s-city__item_city.clicked,.s-city__item_light.clicked,.s-city__item_country.clicked{background:#4d5961}.s-city__item_light{color:#fff}.s-city__item{border-bottom:1px solid #344047}.s-city__wrap{background:#4d5961}.drop-down-label_single.js-clicked,.drop-down-label_single.js-clicked .t,.drop-down-label.js-clicked,.drop-down-label.js-clicked .t{color:#57a3ea!important}.list-link{color:#fff}.drop-down-label:hover,.drop-down-label:hover .t,.drop-down-label.js-clicked:hover,.drop-down-label.js-clicked:hover .t{color:#57a3ea!important}.drop-down-label{color:#fff}.ico_arr5,.ico_arr_bottom{background-position:-180px -238px}.ico_search_blue{background-position:-378px -162px}.b-title__spoiler{background:#4d5961}.attention{background:#4d5961;border:1px solid #344047}.ico_add_univer{background-position:0 -112px}.ico_add_school{background-position:-68px -112px}.ico_gifts_blue{background-position:-306px -198px}.ico_write,body a.stnd-link_disabled .ico_write,body a.stnd-link_disabled:active .ico_write,body .list-link.user__tools-link_disabled .ico_write,body .user__tools-link.user__tools-link_disabled .ico_write{background-position:-324px -54px!important}.ico_befriends_inprocess{background-position:-198px -292px}.ico_gifts,.stnd-link_disabled:active .ico_gifts,body .user__tools-link.user__tools-link_disabled .ico_gifts{background-position:-306px -180px}.ico_tort{background-position:-198px -256px}.ico_add_blue{background-position:-396px -36px}.ico_ed_middle{background-position:-360px -162px}.ico_settings_light{background-position:-234px -274px}.ico_ok_blue{background-position:-116px -198px}.ico_download,.ico_down_blue{background-position:-170px -198px}.ico_complaint{background-position:-288px -36px}.ico_read,body .list-link.user__tools-link_disabled:hover .ico_read,body .user__tools-link.user__tools-link_disabled .ico_read,body a.stnd-link_disabled .ico_read,body a.stnd-link_disabled:active .ico_read{background-position:-306px -292px}.ico_write,body a.stnd-link_disabled .ico_write,body a.stnd-link_disabled:active .ico_write,body .list-link.user__tools-link_disabled .ico_write,body .user__tools-link.user__tools-link_disabled .ico_write{background-position:-324px -54px}.ico_befriends_on{background-position:-162px -292px}.ico_question_grey{background-position:-126px -220px}.ico_download2_grey{background-position:-234px 0}.links-group .ico_arr_bottom,.drop-down-label_single.drop-down-label .ico_arr_bottom,.drop-down-list_inner .drop-down-label .ico_arr_bottom,.ico_arr_bottom_grey{background-position:-270px -180px}.ico_download2_blue{background-position:-206px -198px}.ico_plus_white{background-position:-360px -108px}.ico_galoom_white,.ico_galoom{background-position:-198px -346px}.ico_mail_white{background-position:-324px -90px}.ico_mymir_white,.soc-link .ico_mymir,.soc-link:active .ico_mymir,.soc-button .ico_mymir{background-position:-162px -346px}.ico_twitter_white{background-position:-108px -346px}.ico_fb_white,.soc-link .ico_fb,.soc-link:active .ico_fb,.soc-button .ico_fb{background-position:-180px -346px}.ico_odnk_white,.soc-link .ico_odnk,.soc-link:active .ico_odnk,.soc-button .ico_odnk{background-position:-144px -346px}.ico_vk_white,.soc-link .ico_vk,.soc-link:active .ico_vk,.soc-button .ico_vk{background-position:-126px -346px}.ico_rating{background-position:-36px -220px}.ico_info{background-position:-234px -180px}.ico_forum,.chb-icons .form-checkbox_checked .ico_forum{background-position:-144px -274px}.ico_user{background-position:-234px -72px}.ico_arrow{background-position:-414px -321px}.ico_com{background-position:-414px -166px}.ico_users_group{background-position:-90px -180px}.ico_user_online{background-position:-162px -220px}.ico_pause,.playing .p_i_t_pb_image{background-position:-414px -58px}.ico_reload_gray{background-position:0 -238px}.ico_download2{background-position:-188px -198px}.ico_plus_darkblue,.js-clicked .ico_plus_grey{background-position:-324px -288px}.ico_player_next{background-position:0 -364px}.ico_player_prev{background-position:-234px -90px}a:hover .ico_lenta_comments,.ico_soo_down,.ico_weather_xlarge,.ico_spacesru{background-position:0 -66px}.ico_play,body .p_i_t_pb_image{background-position:-414px -148px}.ico_ok_active{background-position:-252px -124px}.ico_arr,.ico_arr2{background-position:-414px -265px}.ico_arr3{background-position:-414px -237px}.ico_arr_bottom_white{background-position:-270px -162px}.location-bar__home-link{background-position:-396px 0}.ico_reload_darkblue{background-position:-252px -216px}.ico_remove,body input[type='submit'].delete-btn{background-position:-378px -306px}.help-block{border-bottom:1px solid #344047}.p_i_p_progressLine{background-color:#9ab2cc}.ico_friends_grey{background-position:-252px -364px}.ico_settings{background-position:-98px -198px}.ico_fav,.ico_fav_grey{background-position:-216px -256px}.ico_more{background-position:-36px -292px}.ico_fav_on{background-position:-252px -256px}.ico_add{background-position:-270px -274px}.ico_history{background-position:-306px 0}.ico_exit{background-position:-306px -54px}.ico_plus_grey{background-position:-180px -328px}.ico_smile{background-position:-396px -126px}.ico_plus{background-position:-62px -198px}.ico_arrow-back,.ico_arr11{background-position:-414px -349px}.ico_upload{background-position:-396px -72px}.ico_gb{background-position:-126px -256px}.ico_blog{background-position:-144px -256px}.ico_game{background-position:-288px -90px}.ico_photo,.chb-icons .form-checkbox_checked .ico_photo{background-position:-288px -162px}.ico_music,.chb-icons .form-checkbox_checked .ico_music{background-position:-288px -252px}.ico_video,.chb-icons .form-checkbox_checked .ico_video{background-position:-36px -274px}.ico_file,.chb-icons .form-checkbox_checked .ico_file{background-position:-90px -274px}.ico_comm{background-position:-52px -180px}.ico_friends{background-position:-306px -234px}.ico_readers{background-position:-109px -180px}.ico_readers{background-position:-109px -180px}.ico_int_people{background-position:-306px -270px}.ico_add_user{background-position:-166px 0}.ico_wait{background-position:-252px -198px}.player_item{color:#fff!important}.gp-playlist_active{background:#344047!important}.stnd_padd{background:#4d5961}.light_border_bottom{border-bottom:1px solid #344047;background:#4d5961!important}.upper_case{color:#a7b8c6}.gp-info_wrap{color:#fff}.gp-content:hover{background-color:#818f99}.gp-content{background-color:#4d5961}.user__tools{border-bottom:1px solid #344047}.user__details{color:#a7b8c6}.blog-toolbar{color:#a7b8c6}.switch__item{background:#344047}.switch__item_current{background:#4d5961!important;color:#fff}.text-input{border:1px solid #344047;background:#4d5961;color:#fff}.btn-min{border:1px solid #344047}.text-input-wrapper_inline{border:1px solid #344047}.tabs__item_disabled,.tabs__item_disabled:active{background:#4d5961!important}.dropdown-menu_text{background:#4d5961}.pgn__button:active,.pgn__button_press,.pgn__button_press:hover,.mail__button:active{color:#7a90a0!important;background:#344047!important;-webkit-box-shadow:inset 0 3px 5px #293238!important;-moz-box-shadow:inset 0 3px 5px #293238!important;box-shadow:inset 0 3px 5px #293238!important}.pgn__search_input{background:#4d5961;border:1px solid #373f46;-webkit-box-shadow:inset 0 3px 5px #374047;-moz-box-shadow:inset 0 3px 5px #374047;box-shadow:inset 0 3px 5px #374047}.mail__dialog_message{background:#404a51}.mail__dialog_answer{background:#344047}.mail__dialog_text{color:#fff!important}.comm_selected .comm{background:#344047}.system-message_alert{color:#ff6837!important;background:#f9edbf}.info-item{color:#fff}.content-bl{color:#fff}.b-title__all::before{content:unset}a:hover .b-title__all{background:#344047}.file_name,.search_bar,.more_link,.list_item,.edit_title_block,.busi_switcher table a,.edit_button{color:#fff}.links-group_sections .list-link:hover{color:#fff!important}.list-link-grey:active,.inl-link.js-clicked,.l-gr .list-link:active,.links-group .list-link:active,.list-link:active .lgrey2,body .links-group .list-link-blue:active{color:#fff!important}.bubble::after,.user__status::after{border-bottom-color:#404a51}.bubble,.user__status{background:#404a51;color:#a7b8c6}#wrap_all{background:#4d5961}.ico_mail{background:url(https://" + gitPages + "/src/darkmode/ico_mail.png) no-repeat}.ico_mail_inbox{background-position:0 -126px}.ico_mail_fav{background-position:-90px -54px}.ico_mail_write{background-position:-32px -126px}.ico_mail_restore_grey{background-position:-17px -108px}.ico_mail_spoiler{background-position:-72px -54px}.ico_mail_message{background-position:-68px -108px}.ico_mail_fav_blue{background-position:-90px -18px}.ico_mail_archive_blue{background-position:-126px -54px}.ico_mail_spam_blue{background-position:-18px -90px}.ico_mail_garbage_blue{background-position:-126px 0}.ico_mail_cog_blue{background-position:-54px -18px}a.inl-link:hover .ico_cats_city,.ico_cats_city_black,.ico_leads,.ico_mail_quote,#present_link span{background-position:-36px -36px}.ico_cats_news_black,a:active .ico_cats_news,a.stnd-link_active .ico_cats_news,.ico_cats_news_black,.ico_mail_link{background-position:-18px -72px}.ico_cats_subculture_black,a:active .ico_cats_subculture,a.stnd-link_active .ico_cats_subculture,.ico_cats_subculture_black,.ico_chat_journal_blue,.ico_mail_color,.pc .voteDownCnt:hover span,.voteDownCnt span.on,.pc .voteDownCnt:hover span.on{background-position:-18px -54px}.ico_settings_black_blue,.ico_mail_bold,.voteDownCnt span{background-position:-18px 0}.ico_rules,.ico_mail_italic,.voteUpCnt span{background-position:0 -18px}.ico_journal,.ico_mail_underline,#mail_link span{background-position:-36px 0}.ico_cats_rpg_black,a:active .ico_cats_rpg,a.stnd-link_active .ico_cats_rpg,.ico_cats_rpg_black,.ico_people_in_viktorina,.ico_mail_strike,#bookmark_link span{background-position:0 -36px}.ico_mail_code{background-position:-18px -126px}.ico_mail_background,#comment_link span{background-position:-72px 0}.ico_mail_picture{background-position:0 0}.ico_mail_music{background-position:-90px -36px}.ico_mail_video{background-position:-108px -52px}.f__ico_contacts,.ico_files_zip,.ico_mail_file{background-position:-126px -72px}.ico_mail_spam,.mail__button.disabled:active .ico_mail_spam{background-position:-36px -90px}.ico_mail_garbage_red{background-position:-108px -88px}.ico_mail_attach{background-position:-54px -72px}.ico_attaches{background:url(https://" + gitPages + "/src/darkmode/ico_attaches.png) no-repeat}.ico_attaches_picture{background-position:-18px -18px}.ico_attaches_poll{background-position:-36px 0}.ico_attaches_file{background-position:-18px -36px}.ico_attaches_music{background-position:0 -18px}.ico_attaches_attach{background-position:-18px 0}#sidebar_wrap{background:#4d5961}.ico_mail_receive{background-position:-104px -108px!important}.ico_mail_archive{background-position:-126px -36px!important}.ico_mail_garbage{background-position:-51px -108px!important}#left_nav ul li.li a,.s_title{color:#fff}.s_i{background:url(https://" + gitPages + "/src/darkmode/ico_sidebar_pc.png)no-repeat!important;width:16px;height:16px}.s_i_spaceplus{background-position:-126px -128px!important}.s_i_cake{background-position:-18px 0!important}.s_i_exchange{background-position:-36px -36px!important}.s_i_love{background-position:0 -72px!important}.s_i_music{background-position:-72px -36px!important}.s_i_diary{background-position:-36px 0!important}.s_i_community{background-position:0 -18px!important}.s_i_forum{background-position:-36px -54px!important}.s_i_chat{background-position:0 -36px!important}.s_i_games{background-position:-54px -18px!important}.s_i_announcement{background-position:-72px 0!important}.s_i_people{background-position:0 -54px!important}.s_i_guestbook{background-position:0 -126px!important}.s_i_files{background-position:-126px -18px!important}.s_i_videos{background-position:-126px -54px!important}.s_i_photos{background-position:-126px -90px!important}.s_i_city{background-position:-108px -36px!important}.s_i_mobiles{background-position:-72px -72px!important}.s_i_info{background-position:-90px -18px!important}.s_i_favorites{background-position:-72px -126px!important}.s_i_friends{background-position:0 -108px!important}.s_i_history{background-position:-36px -126px!important}.s_i_links{background-position:-108px -108px!important}.s_i_options,.s_i_menu{background-position:-108px -72px!important}.s_i_allservices_gray{background-position:-72px -108px!important}.s_i_help{background-position:-90px -54px!important}.s_i_exit{background-position:-36px -108px!important}.left_nav_search_input,.reg_text_input{background:#434b5a;border:1px solid #232833}#left_nav ul li.li a:hover{background:#818f99}.s_title,#left_nav ul li.li a.title_link{color:#fff}.left_nav_search_input:hover{background:#434b5a}#main_search_input{color:#c4ccda}body #left_nav ul li.li a:active{color:#fff;background:#344047;-webkit-box-shadow:inset 0 3px 5px #192228;-moz-box-shadow:inset 0 3px 5px #192228;box-shadow:inset 0 3px 5px #192228}.left_nav_padding input.search__btn:focus{background:#434b5a}.main,#logo_panel,.item_head_bg{background:#404a51}.location-bar{color:#fff;background:#4d5961;-webkit-box-shadow:0 3px 5px #293238;-moz-box-shadow:0 3px 5px #293238;box-shadow:0 3px 5px #293238}.location-bar::after{background:#4d5961}.tile-menu__title{color:#fff}.tile-menu__link{background:#4d5961;-webkit-box-shadow:0 3px 5px #293238;-moz-box-shadow:0 3px 5px #293238;box-shadow:0 3px 5px #293238}.pc .tile-menu__link:hover{background:#596671}.tile-menu__link:active{background:#344047!important;-webkit-box-shadow:inset 0 3px 4px #293238;-moz-box-shadow:inset 0 3px 4px #293238;box-shadow:inset 0 3px 4px #293238}.search__input:focus{background:#434b5a}.search__input{background:#434b5a;border:1px solid #232833;color:#fff}.b-title__link,.b-title__item{color:#fff!important}.widgets-group,.m44f47fd1,.spoiler_inject::before,.our_spo_inj::before,.content-item,.dropdown-menu_text,.btn-single,.tabs::before,.spaced-group a,.user-tile__similarity-wrapper,.pgn,.shdw,.ma74074b9{-webkit-box-shadow:0 3px 5px #293238;-moz-box-shadow:0 3px 5px #293238;box-shadow:0 3px 5px #293238}.b-title{background:#344047}.b-title__link:hover,.header_links_fixer a:hover{background:#4d5961}.page_fixer{background:#404a51}.b-title__all{background:#344047}.carousel-bg{background:#4d5961}.b-title__all::before,.b-title__edit-link::before{background:#344047}.carousel-prev .carousel-edges_shadow{left:10px}.list-link{background:#4d5961;border-bottom:1px solid #344047}.blog-item__author,.blog-item__time,.normal-light{color:#fff}.list-link:hover,.me6d43f28:hover,.list-link__wrap_hover .list-link,.tabs__item:hover,.btn-main:hover,.btn-block:hover,.user__tools-link:hover,a.user__tools-link:hover,.user-tile__btn:hover,a.hover-item:hover,.tile__bottom-link:hover,.btn-link:hover,.stnd-link:hover,.s-city__item:hover,.s-chb:hover,a:hover .bordered,.pgn__link_hover:hover,.links-group_grey .list-link.strong_clicked,.form-checkbox_dropdown-menu:hover,.dropdown-menu .list-link:hover,.dropdown-menu .list-link__wrap_hover .list-link{background:#818f99}.list-link-darkblue,.links-group .list-link_arrow,.links-group .list-link-darkblue,.links-group .stnd-link_profile{color:#fff!important}.list-link-darkblue .cnt{color:#57a3ea}.wbg{background:#4d5961!important}.block-item__descr{color:#fff}.content-usr{background:#4d5961;-webkit-box-shadow:0 3px 5px #293238;-moz-box-shadow:0 3px 5px #293238;box-shadow:0 3px 5px #293238}.black{color:#fff}.table__cell{border-right:1px solid #344047}.stnd-link,.stnd-block{color:#fff;background:#4d5961}.user__tools{border-top:1px solid #344047}.list-link_online{-webkit-box-shadow:0 3px 4px #293238;-moz-box-shadow:0 3px 4px #293238;box-shadow:0 3px 4px #293238}.no-break::before{display:none}.blog-item__subject,.blog-item__channel,.blog-item_short_shared .black{color:#fff}.blog-item__title{color:#fff}.content-bl{background:#4d5961}#main_page a:visited,a,a.edit_link:visited,a.user_link:visited,.tools_block a,.sub_menu a,.inl-link,.link-stnd,.text-title,.nl a,.link-darkblue,.anketa__rate-link,.info-item__descr a,.info-item__descr-link,.drop-down-label.drop-down-label_spoiler,.t-strong_item,.blog-item__title,.list-link__name,.md77b4724,.f_descr_text,a.arrow_link span,.ufi a span,.response,.url-btn,.edit_widget_title,.ewb span{color:#57a3ea}.list-link__text{color:#fff}.mysite-nick{color:#fff}.text-color,.links-group_important .list-link.clicked{color:#fff!important}.link-return{color:#57a3ea!important}.comm{background:#4d5961;border-bottom:1px solid #344047}.text,.text_anketa{color:#fff}.spoiler_inject,.our_spo_inj{background:#404a51}.dropdown-menu__wrap{background:#344047;-webkit-box-shadow:0 3px 5px #293238;-moz-box-shadow:0 3px 5px #293238;box-shadow:0 3px 5px #293238}.links-group_grey .list-link,.links-group_grey .stnd-link{color:#fff!important}.list .stnd-link{border-bottom:1px solid #344047}.tabs{background:#4d5961}.tabs__link{color:#fff}.list-link:active,.me6d43f28:active,.soc-links .list-link_soc.clicked,.soc-links .list-link_soc:active,.dropdown-menu .list-link:active,.user__tools-link:active,a.user__tools-link:active,a.user__tools-link.clicked,button.user__tools-link:active,.tabs__item:active,.btn-link:active,.user-tile__btn:active,.clicked,.tabs__item.clicked,.stnd-link.clicked,.header_links_fixer a:active,.clicked .stnd-link,.list-link.clicked,.dropdown-menu .list-link.clicked,label.user__tools-link.clicked,label.user__tools-link.clicked:hover,a.hover-item:active,.js-clicked .btn-single,.js-clicked .btn-single:hover,a.hover-item.clicked,.stnd-link:active,.stnd-link.attention_block:active,body .stnd-link_active,body .stnd-link_active:hover,.s-chb:active,.tile__bottom-link:active,.s-city__item:active,.c-letter__more-btn,.form-checkbox_dropdown-menu:active,.pgn__link_hover:active,.b-title__link:active,.s-city__item_city.clicked:active,.s-city__item_light.clicked:active,.s-city__item_country.clicked:active,.dropdown-menu .list-link.strong_clicked_active,.btn-main:active,.btn-block:active,a.item_clicked,a.item_clicked:hover,.js-dd_menu_link.strong_clicked,.user-tile__btn.js-clicked{background:#344047;-webkit-box-shadow:inset 0 3px 5px #293238;-moz-box-shadow:inset 0 3px 5px #293238;box-shadow:inset 0 3px 5px #293238}.tabs .clicked::before{display:none}.content-widget{background:#4d5961}.cnt_tabs{border:1px solid #becedd;color:#57a3ea}.drop-down-label:hover,.drop-down-label:hover .t,.drop-down-label.js-clicked:hover,.drop-down-label.js-clicked:hover .t{color:#61a961}.static-bl{background:#4d5961;border-bottom:1px solid #344047;color:#fff}.bg-white,.dropdown-menu .list-link{background:#4d5961}.sep-item{border-bottom:2px solid #344047}.table__cell_block{border-bottom:1px solid #344047}.btn-link{border:1px solid #344047;background:#4d5961}.anketa__rate-cnt,.sub-title{color:#fff}.cnt{border:1px solid #344047}.sub-title .cnt,.list-link-darkblue:active .cnt,.stnd-link_profile:active .cnt{color:#57a3ea}.btn-single{background:#4d5961;color:#fff}.stnd-link_important,.links-group .stnd-link_arr.list-link-blue{color:#fff!important}.block-item{background:#404a51}.pgn{background:#4d5961}.table_top_border{border-top:1px solid #344047!important}.oh break-word{color:#fff}.content,.list_spaced{background:#4d5961}.content-item3{color:#fff}.form-checkbox_full,.f-c_fll .form-checkbox{border-bottom:1px solid #344047}.user__tools-link{background:#4d5961}.list-link-blue,.stnd-link_important,.links-group .stnd-link_arr.list-link-blue{color:#fff}.stnd_padd{color:#fff}.form-checkbox_checked{color:#fff!important}.content-bl__sep,.content-bl__sep2,.text_anketa_sep{border-bottom:1px solid #344047}.action-bar{border-top:1px solid #344047}button.btn-main,input[type='submit'].btn-main,.btn-main:visited,.btn-main,.btn-block{background:#4d5961;color:#fff}.light_bg{background:#404a51}.toolbar td,.toolbar .hide td:last-child{border-right:1px solid #344047}.toolbar__wrap table{border:1px solid #344047}.toolbar .list-link{border-bottom:1px solid #344047}.text_distinguish{color:#57a3ea!important}.green,.green_link,.link-green,a.green_link span,#e0437eeb07 a{color:#56e456}.mail__button{background:#4d5961!important}.mail__button.disabled,.mail__button.disabled:focus,.mail__button.disabled:hover{background:#4d5961!important;color:#fff!important;opacity:unset}.mail__message_text.m_my_not_read{background:#344047}.pgn__button:hover,.mail__button:hover{background:#4d5961!important;color:#fff}.pgn__button,.mail__button{color:#fff}.color-black-light{color:#fff}.content-bl__top_sep{border-top:1px solid #344047}.b-title__edit-link::after,.b-title__edit-link::before{background:#344047}.ico_cats{background:url(https://" + gitPages + "/src/darkmode/ico_cats.png) no-repeat}.ico_cats_news,.ico_cats_news_black{background-position:-80px -54px}.ico_cats_game,.ico_cats_game_black{background-position:-36px -178px}.ico_cats_humor,.ico_cats_humor_black{background-position:-134px 0}.ico_cats_programm,.ico_cats_programm_black{background-position:0 -144px}.ico_cats_internet,.ico_cats_internet_black{background-position:-18px -90px}.ico_cats_science,.ico_cats_science_black{background-position:-134px -72px}.ico_cats_auto,.ico_cats_auto_black{background-position:-169px -96px}.ico_cats_sport,.ico_cats_sport_black{background-position:-116px 0}.ico_cats_business,.ico_cats_business_black{background-position:-144px -144px}.ico_cats_hobby,.ico_cats_hobby_black{background-position:-126px -144px}.ico_cats_video,.ico_cats_cinema,.ico_cats_cinema_black{background-position:-152px -36px}.ico_cats_music,.ico_cats_music_black{background-position:-17px -126px}.ico_cats_design,.ico_cats_design_black{background-position:-34px -126px}.ico_cats_book,.ico_cats_book_black{background-position:-159px -160px}.ico_cats_philosophy,.ico_cats_philosophy_black{background-position:-152px -90px}.ico_cats_relationship,.ico_cats_relationship_black{background-position:0 -108px}.ico_cats_politic,.ico_cats_politic_black{background-position:-72px -144px}.ico_cats_education,.ico_cats_education_black{background-position:-134px -36px}.ico_cats_remont,.ico_cats_remont_black{background-position:-36px -72px}.ico_cats_remont,.ico_cats_remont_black{background-position:-36px -72px}.ico_cats_animal,.ico_cats_animal_black{background-position:-62px -18px}.ico_cats_cook,.ico_cats_cook_black{background-position:-187px 0}.ico_cats_moda,.ico_cats_moda_black{background-position:-98px 0}.ico_cats_health,.ico_cats_health_black{background-position:-54px -108px}.ico_cats_travel,.ico_cats_travel_black{background-position:-98px -54px}.ico_cats_spaces,.ico_cats_spaces_black{background-position:-33px -160px}.ico_cats_other,.ico_cats_other_black{background-position:-44px -18px}.ico_cats_dating,.ico_cats_dating_black{background-position:-169px -32px}.ico_cats_rpg,.ico_cats_rpg_black{background-position:-80px -18px}.ico_cats_house,.ico_cats_house_black{background-position:-124px -126px}.ico_cats_sex,.ico_cats_sex_black{background-position:-87px -160px}.ico_cats_photo,.ico_cats_photo_black{background-position:-116px -54px}.ico_cats_profession,.ico_cats_profession_black{background-position:-169px -141px}.ico_cats_subculture,.ico_cats_subculture_black{background-position:-54px -54px}.ico_cats_city,.ico_cats_city_black{background-position:-18px -36px}.ico_cats_gadget,.ico_cats_gadget_black{background-position:-187px -88px}.ico_chat{background:url(https://" + gitPages + "/src/darkmode/ico_chat.png) no-repeat}.ico_journal,.ico_mail_underline,#mail_link span{background-position:-36px 0}.ico_rules,.ico_mail_italic,.voteUpCnt span{background-position:0 -18px}.ico_settings_black_blue,.ico_mail_bold,.voteDownCnt span{background-position:-18px 0}.ico_lock_open,#shared_link span.on{background-position:-54px -36px}.ico_lock,#shared_link span{background-position:-54px -18px}.ico_rings{background-position:0 -54px}";
-                        sdm.setAttribute("sp-darkmode", "1");
-                        parent.appendChild(sdm);
-                        if (_SETTINGS.darkModeNav) {
-                            sdm = main.qs("#SP_PLUS_DARKMODE_NAV") || main.ce("style", {
-                                id: "SP_PLUS_DARKMODE_NAV",
-                                type: "text/css"
-                            });
-                            sdm.innerHTML = "#left_nav{border-top: 1px solid #344047;}#navi,.sidebar-logo,.unauth_header,.horiz-placeholder,.horiz-menu_bottom{color:#fff;background:#344047;border-bottom:1px solid #344047;border-left:1px solid #344047;border-right:1px solid #344047}.footer{background-color:#344047}.footer__link{border-color:#283238}.footer__link_edit .footer__link,.footer__link_tool .footer__link,.footer__link_moder .footer__link{border-color:#283238}";
-                            sdm.setAttribute("sp-darkmode-nav", "1");
-                            parent.appendChild(sdm);
-                        }
-                    } else if (!_SETTINGS.darkMode && sdm && sdm.hasAttribute("sp-darkmode") && !t) {
-                        sdm.removeAttribute("sp-darkmode");
-                        parent.removeChild(sdm);
-                        var nav = document.getElementById('SP_PLUS_DARKMODE_NAV');
-                        if (nav) {
-                            parent.removeChild(nav);
-                        }
+                    if (!script) {
+                        var apidebug = main.ce("script", {
+                            type: "text/javascript",
+                            html: 'var Arr=[\'<div class="time-block" style="text-align: left; padding: 4px; background: #cddae7; border-bottom: 1px solid #a7b4c7;" id="spaces_api_debugger"><a href="#" id="api_debug-button" style="color: #0e3c87; margin-left: 5px"><span class="ico_cats" style="background-position: -54px -54px;margin: 0 4px -4px 0;"></span> Debugger</a><a href="https://spaces-dev.github.io/api" style="color: #0e3c87; float: right" target="_blank">API Methods</a><div id="api_debug-place" style="display: none; margin-top: 5px"></div></div>\',"append","parent","#navi","debugger"];$(Arr[3])[Arr[2]]()[Arr[1]](Arr[0]),require(Arr[4]);void(0);'
+                        });
+                        document.getElementsByTagName('head')[0].appendChild(apidebug);
                     }
                 } catch (e) {
-                    main.console.error('Ошибка (DARKMODE): ' + e.name + ":" + e.message + "\n" + e.stack);
-                }
-            },
-            darkModeNav: function(t) {
-                try {
-                    var parent = document.getElementsByTagName('head').item(0);
-                    var sdm = main.qs("#SP_PLUS_DARKMODE_NAV") || main.ce("style", {
-                        id: "SP_PLUS_DARKMODE_NAV",
-                        type: "text/css"
-                    });
-                    var dmNav = main.ce("div", {
-                        id: "SP_DARKMODE_WRAP",
-                        class: "stnd-link",
-                        style: "border-bottom: unset;"
-                    });
-                    var dm = main.ce("input", {
-                        type: "checkbox",
-                        id: "sp_darkMode_nav",
-                        class: "sp-checkbox-square",
-                        checked: _SETTINGS.darkModeNav,
-                        onclick: function(t) {
-                            _SETTINGS.darkModeNav = t.target.checked;
-                            var jsonSet = JSON.stringify(_SETTINGS);
-                            main.setCookie("SP_PLUS_SET", jsonSet, null);
-                            if (sdm && !sdm.hasAttribute("sp-darkmode-nav") && t) {
-                                sdm.innerHTML = "#left_nav{border-top: 1px solid #344047;}#navi,.sidebar-logo,.unauth_header,.horiz-placeholder,.horiz-menu_bottom{color:#fff;background:#344047;border-bottom:1px solid #344047;border-left:1px solid #344047;border-right:1px solid #344047}.footer{background-color:#344047}.footer__link{border-color:#283238}.footer__link_edit .footer__link,.footer__link_tool .footer__link,.footer__link_moder .footer__link{border-color:#283238}";
-                                sdm.setAttribute("sp-darkmode-nav", "1");
-                                parent.appendChild(sdm);
-                            } else if (!_SETTINGS.darkModeNav && sdm && sdm.hasAttribute("sp-darkmode-nav")) {
-                                sdm.removeAttribute("sp-darkmode-nav");
-                                parent.removeChild(sdm);
-                            }
-                        }
-                    });
-                    var dmCheck = main.ce("label", {
-                        attr: {
-                            "for": "sp_darkMode_nav"
-                        },
-                        html: "Темный цвет шапки и подвала"
-                    });
-                    dmNav.appendChild(dm);
-                    dmNav.appendChild(dmCheck);
-                    main.insertAfter(dmNav, t.parentNode);
-                } catch (e) {
-                    main.console.error('Ошибка (DARKMODE-NAV): ' + e.name + ":" + e.message + "\n" + e.stack);
+                    main.console.error('Ошибка (SPACES-API-DEBUGGER): ' + e.name + ":" + e.message + "\n" + e.stack);
                 }
             },
             setStyle: function() {
-                var parent = document.getElementsByTagName('head').item(0);
+                var rev = main.service(1);
                 var stl = main.qs("#SP_PLUS_INJSTYLE") || main.ce("style", {
                     id: "SP_PLUS_INJSTYLE",
                     type: "text/css"
                 });
-                stl.innerHTML = ".sp-cbfb+label:before{left:12px!important;top:13px!important}.sp-cbfc+label:before{left:10px!important;top:13px!important}.sp-cbfr+label:before{left:5px!important;top:2px!important}input::-webkit-outer-spin-button,input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}input[type=number]{-moz-appearance:textfield}.rotate270{transform:rotate(270deg) translateY(-100%) translateY(100%) translateX(100%) translateX(-100%)!important}.rotate180{transform:rotate(180deg) translateY(100%) translateY(-100%)!important}.rotate90{transform:rotate(90deg)!important}.sp_plus_line_c:before{content:'';display:block;border-bottom:1px solid #cdd4e1;left:48px;right:80px;top:50%;position:absolute}.sp_plus_line_c{position:relative}ul.list>li{margin:10px}.close_h:hover{opacity:.8}@media (min-width:1024px){.w400{max-width:400px}}#main_shadow,#top_info_block{border-left:unset}.border{border:1px solid #b4bed1}#check_point_full_info{background:#4d5961;box-shadow:0 3px 5px #293238}#debug .check_point:hover,.tree_element:hover>.ns{background:#818f99}.disabled{cursor:not-allowed}div.row4{color:#000}input[type=range]{background:0 0;height:0;-webkit-appearance:none;margin:10px 0;width:100%}input[type=range]:focus{outline:0}input[type=range]::-webkit-slider-runnable-track{width:100%;height:10px;cursor:pointer;animation:.2s;background:#395387;border-radius:32px;border:0 solid #000}input[type=range]::-webkit-slider-thumb{border:0 solid #2497e3;height:10px;width:10px;border-radius:4px;background:#395387;cursor:pointer;-webkit-appearance:none;margin-top:0}input[type=range]:focus::-webkit-slider-runnable-track{background:#d2e3f4}input[type=range]::-moz-range-track{-webkit-box-shadow:inset 0 1px 2px #7690c7;-moz-box-shadow:inset 0 1px 2px #7690c7;box-shadow:inset 0 1px 2px #7690c7;width:100%;height:10px;cursor:pointer;animation:.2s;background:#d2e3f4;border-radius:32px;border:0 solid #000}input[type=range]::-moz-range-thumb{border:0 solid #2497e3;height:10px;width:10px;border-radius:4px;background:#395387;cursor:pointer}input[type=range]::-ms-track{width:100%;height:10px;cursor:pointer;animation:.2s;background:0 0;border-color:transparent;color:transparent}input[type=range]::-ms-fill-lower{background:#d2e3f4;border:0 solid #000;border-radius:64px}input[type=range]::-ms-fill-upper{background:#d2e3f4;border:0 solid #000;border-radius:64px}input[type=range]::-ms-thumb{margin-top:1px;border:0 solid #2497e3;height:10px;width:10px;border-radius:4px;background:#395387;cursor:pointer}input[type=range]:focus::-ms-fill-lower{background:#d2e3f4}input[type=range]:focus::-ms-fill-upper{background:#d2e3f4}input[type=range]::-moz-range-progress{border-radius:4px;height:10px;background-color:#395387}input[type=range]::-ms-fill-lower{border-radius:4px;height:10px;background-color:#395387}#SP_PLUS_SETAREA{-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none}details summary:hover{cursor:pointer}.sp{background-image:url(https://spaces-dev.github.io/src/attaches/ico/sp-icons.png);display:inline-block;width:16px;height:16px;margin:0 4px -3px 0}.sp-checkbox-checked+label,.sp-checkbox-circle+label,.sp-checkbox-square+label{position:relative;overflow:hidden;cursor:pointer;text-decoration:none!important}.sp-checkbox-checked+label{margin-left:5px;padding:0 4px;vertical-align:top;width:16px;height:16px;display:inline-block}.sp-checkbox-circle+label,.sp-checkbox-square+label{padding:12px 5px 12px 22px}.sp-checkbox-checked+label:before,.sp-checkbox-square+label:before{position:absolute;display:inline-block;content:'';background-position:-32px -16px;width:16px;height:16px;background-color:transparent;background-image:url(https://spaces-dev.github.io/src/attaches/ico/sp-icons.png)}.sp-checkbox-checked+label:before,.sp-checkbox-circle+label:before{position:absolute;display:inline-block;content:'';background-position:-16px -16px;width:16px;height:16px;background-color:transparent;background-image:url(https://spaces-dev.github.io/src/attaches/ico/sp-icons.png)}.sp-checkbox-square+label:before{left:0;top:12px}.sp-checkbox-circle+label:before{left:0;top:12px}.sp-checkbox-checked+label:before{top:8px;margin-top:-8px}.sp-checkbox-checked:checked+label:before,.sp-checkbox-circle:checked+label:before,.sp-checkbox-square:checked+label:before{background-position:0 -16px}.sp-checkbox-checked,.sp-checkbox-circle,.sp-checkbox-square{position:absolute;left:-10000px}.sp_plus_line>span{background:#fff;padding:0 5px;position:relative;margin:0 10px;display:inline-block}.sp_plus_line:before{content:'';display:block;border-bottom:1px solid #cdd4e1;left:0;right:0;top:50%;position:absolute}.sp_plus_line{text-align:center;position:relative;font-weight:700}.sp_plus_text{color:#395387}.sp_lines{border-top:1px solid #c5d3e1!important}.bstrwrap{border-bottom:unset!important;border-top:1px solid #cdd4e1}input[type=color]{opacity:0;cursor:pointer}.sp_btn_line{border-right:1px solid #cdd4e1}.sp-qrcode{background-position:0 0}.sp-alert{background-position:-16px 0}.sp-backup-g{background-position:-32px 0}@media (max-width:899px){.sp-ico{background-position:-64px -32px!important}}.sp-ico{display:block;position:absolute;top:50%;margin:-8px 0 0 -26px;background-position:-48px 0}.sp-download-darkblue{background-position:-48px -16px}.sp-enter-grey{background-position:0 -32px}.sp-exit-grey{background-position:-16px -32px}.sp-fav{background-position:-32px -32px}.sp-fav-on{background-position:-48px -32px}.sp-love{background-position:0 -48px}.sp-ok-blue{background-position:-16px -48px}.sp-play-green{background-position:-32px -48px}.sp-remove-grey{background-position:-48px -48px}.sp-restore-blue{background-position:-64px 0}.sp-restore-g{background-position:-64px -16px}.sp-write-grey{background-position:-64px -48px}";
+                if (!main.qs("#SP_PLUS_MENU")) {
+                    var menu = main.qs("#SP_PLUS_MENU") || main.ce("link", {
+                        rel: "stylesheet",
+                        type: "text/css",
+                        id: "SP_PLUS_MENU",
+                        href: "https://" + gitPages + "/src/attaches/css/menu.css?r=" + rev
+                    });
+                    document.getElementsByTagName('head')[0].appendChild(menu);
+                }
                 if (_SETTINGS.bodystyle) {
-                    if (_SETTINGS.bodystyleSetting.url && _SETTINGS.bodystyleSetting.urlchecked) stl.innerHTML += 'body,#main_wrap{background-image:url(' + _SETTINGS.bodystyleSetting.url + ')}';
-                    if (_SETTINGS.bodystyleSetting.color && _SETTINGS.bodystyleSetting.colorchecked) stl.innerHTML += 'body,#main_wrap{background-color:' + _SETTINGS.bodystyleSetting.color + '}';
+                    if (_SETTINGS.bodystyleSetting.url && _SETTINGS.bodystyleSetting.urlchecked) stl.innerHTML = 'body,#main_wrap{background-image:url(' + _SETTINGS.bodystyleSetting.url + ')}';
+                    if (_SETTINGS.bodystyleSetting.color && _SETTINGS.bodystyleSetting.colorchecked) stl.innerHTML = 'body,#main_wrap{background-color:' + _SETTINGS.bodystyleSetting.color + '}';
                 }
                 if (_SETTINGS.msgAlert) {
-                    if (_SETTINGS.msgAlertSettings.animDelay && _SETTINGS.msgAlertSettings.alertPosition) {
+                    var msg = _SETTINGS.msgAlertSettings;
+                    if (msg.alertPosition || msg.animDelay) {
                         var mailBox, mailContainer;
-                        switch (_SETTINGS.msgAlertSettings.alertPosition) {
-                            case "1":
+                        switch (msg.alertPosition) {
+                            case 1:
                                 mailContainer = 'bottom: 0px; right: 0px; top:0px; left:0px; height: 1px; width: 1px;';
                                 mailBox = 'margin-bottom: 10px;';
                                 break;
-                            case "2":
+                            case 2:
                                 mailContainer = 'top: 0px; right: 0px; height: 1px;';
                                 mailBox = 'margin-bottom: 10px;';
                                 break;
-                            case "3":
+                            case 3:
                                 mailContainer = 'bottom: 0px; left: 0px; width: 1px;';
                                 mailBox = 'margin-top: 10px;';
                                 break;
@@ -2865,12 +2784,12 @@
                                 mailBox = 'margin-top: 10px;';
                                 break;
                         }
-                        stl.innerHTML += '.mailBox{background:#fff; box-shadow: 0 0 5px rgba(93,109,157,.3); text-decoration:none !important; display:block; width:280px; height:auto; ' + mailBox + ' -webkit-animation: create 0.' + _SETTINGS.msgAlertSettings.animDelay + 's; animation: create 0.' + _SETTINGS.msgAlertSettings.animDelay + 's} .mailContainer {z-index: 99999; position: fixed; ' + mailContainer + ' padding: 10px} .mailBox .data {display: inline-block; position: absolute; padding-top: 5px;} .mailBox .avatar {width: 64px; padding-right: 5px; border-radius:2px; margin-bottom: -3px;} .text>img {display: inline-block;}.text>div.image_limit {width: 28px; display: inline-block;} .mailBox .name {line-height: 20px; font-weight: bold;} .mailBox .text {white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: #323232; width: 195px; font-size: small;} @-webkit-keyframes create {0% {opacity: 0;} 100% {opacity: 1;}} @-webkit-keyframes destroy {0% {opacity: 1;} 100% {opacity: 0;}}}';
+                        stl.innerHTML += '.mailBox{background:#fff; box-shadow: 0 0 5px rgba(93,109,157,.3); text-decoration:none !important; display:block; width:280px; height:auto; ' + mailBox + ' -webkit-animation: create 0.' + _SETTINGS.msgAlertSettings.animDelay + 's; animation: create 0.' + _SETTINGS.msgAlertSettings.animDelay + 's} .mailContainer {z-index: 99999; position: fixed; ' + mailContainer + ' padding: 10px} .mailBox .data {display: inline-block; position: absolute;} .mailBox .avatar {width: 64px; padding-right: 5px; border-radius:2px; margin-bottom: -3px;} .text>img {display: inline-block;}.text>div.image_limit {width: 28px; display: inline-block;} .mailBox .name {line-height: 20px; font-weight: bold; width: 185px; overflow: hidden;} .mailBox .text {white-space: nowrap; text-overflow: ellipsis; overflow: hidden; color: #323232; width: 195px; font-size: small; height: 44px;} @-webkit-keyframes create {0% {opacity: 0;} 100% {opacity: 1;}} @-webkit-keyframes destroy {0% {opacity: 1;} 100% {opacity: 0;}}}';
                     }
                 }
-                parent.appendChild(stl);
+                document.getElementsByTagName('head')[0].appendChild(stl);
             },
-            backup: function(id) {
+            spacesBackup: function(id) {
                 window.scrollTo(0, 0);
                 var target = main.qs(id);
                 if (target) {
@@ -2998,7 +2917,7 @@
                                     class: "text-input",
                                     id: "SP_BACKUP_JSON",
                                     cols: "17",
-                                    rows: "52",
+                                    rows: "53",
                                     html: json.result.jsoncopy
                                 });
                                 if (json.result.valid == 1) {
@@ -3027,11 +2946,11 @@
                             }
                         });
                     } catch (e) {
-                        main.console.error('Ошибка (BACKUP_SETTINGS): ' + e.name + ":" + e.message + "\n" + e.stack);
+                        main.console.error('Ошибка (BACKUP-SETTINGS): ' + e.name + ":" + e.message + "\n" + e.stack);
                     }
                 }
             },
-            changeLog: function(id) {
+            spacesChangelog: function(id) {
                 window.scrollTo(0, 0);
                 var target = main.qs(id);
                 if (target) {
@@ -3084,11 +3003,11 @@
                             }
                         });
                     } catch (e) {
-                        main.console.error('Ошибка (CHANGELOG_ALERT): ' + e.name + ":" + e.message + "\n" + e.stack);
+                        main.console.error('Ошибка (CHANGELOG-ALERT): ' + e.name + ":" + e.message + "\n" + e.stack);
                     }
                 }
             },
-            update: function() {
+            spacesUpdater: function() {
                 main.ajax("https://" + gitPages + "/updater.json?r=" + main.service(1), "GET", null, function(r) {
                     if (r) {
                         var _json = {
@@ -3101,8 +3020,8 @@
                         var json = main.extend(_json, JSON.parse(r));
                         var hideVer = 0;
                         if (_SETTINGS.upVersion) hideVer = parseInt(_SETTINGS.upVersion, 10);
-                        BUILD = Math.max(hideVer, BUILD);
-                        if (json.history[0].build > BUILD) {
+                        VERSION = Math.max(hideVer, VERSION);
+                        if (json.history[0].build > VERSION) {
                             main.alert('Доступна новая версия Spaces+ <sup>' + main.rever(json.history[0].build) + '</sup><div class="pad_t_a"></div><small class="grey">' + json.history[0].changes + '</small><div id="SP_UPDATER_BUTTONS" class="pad_t_a"><a class="btn btn_green btn_input" href="http://' + gitPages + '/spaces-plus.user.js?r=' + main.service(1) + '" onclick="document.body.removeChild(this.parentNode.parentNode.parentNode); return true;" target="_blank"> Обновить</a></div>', 1, 1);
                             if (main.qs("#SP_PLUS_ALERT")) {
                                 var hide = main.ce("a", {
@@ -3110,7 +3029,7 @@
                                     class: "btn btn_white btn_input right sticker-close_btn",
                                     html: "Больше не показывать",
                                     onclick: function(e) {
-                                        _SETTINGS['upVersion'] = json.history[0].build;
+                                        _SETTINGS.upVersion = parseInt(json.history[0].build);
                                         var jsonSet = JSON.stringify(_SETTINGS);
                                         main.setCookie("SP_PLUS_SET", jsonSet, null);
                                         document.body.removeChild(e.target.parentNode.parentNode.parentNode);
@@ -3129,33 +3048,43 @@
                     style: "padding: 11px 15px;"
                 });
                 var mAlert = main.ce("input", {
-                    type: "number",
+                    type: "text",
                     class: "text-input",
                     size: 4,
-                    min: 1,
-                    max: 5,
+                    attr: {
+                        maxlength: 1
+                    },
                     value: _SETTINGS.msgAlertSettings.maxAlert
                 });
                 mAlert.onchange = mAlert.oninput = function(e) {
-                    if (e.target.value != '') {
-                        _SETTINGS.msgAlertSettings.maxAlert = e.target.value;
+                    if (/^[1-5]{1}$/i.test(e.target.value)) {
+                        _SETTINGS.msgAlertSettings.maxAlert = parseInt(e.target.value);
                         var jsonSet = JSON.stringify(_SETTINGS);
                         main.setCookie("SP_PLUS_SET", jsonSet, null);
+                        main.setStyle();
+                        mAlert.className = "text-input";
+                    } else {
+                        mAlert.className = "text-input sp-input-error";
                     }
                 };
                 var alertPos = main.ce("input", {
-                    type: "number",
+                    type: "text",
                     class: "text-input",
                     size: 4,
-                    min: 1,
-                    max: 4,
+                    attr: {
+                        maxlength: 1
+                    },
                     value: _SETTINGS.msgAlertSettings.alertPosition
                 });
                 alertPos.onchange = alertPos.oninput = function(e) {
-                    if (e.target.value != '') {
-                        _SETTINGS.msgAlertSettings.alertPosition = e.target.value;
+                    if (/^[1-4]{1}$/i.test(e.target.value)) {
+                        _SETTINGS.msgAlertSettings.alertPosition = parseInt(e.target.value);
                         var jsonSet = JSON.stringify(_SETTINGS);
                         main.setCookie("SP_PLUS_SET", jsonSet, null);
+                        main.setStyle();
+                        alertPos.className = "text-input";
+                    } else {
+                        alertPos.className = "text-input sp-input-error";
                     }
                 };
                 var alertPositionLbl = main.ce("label", {
@@ -3167,18 +3096,23 @@
                     class: "label"
                 });
                 var alertTime = main.ce("input", {
-                    type: "number",
+                    type: "text",
                     class: "text-input",
                     size: 4,
-                    min: 0,
-                    max: 5,
+                    attr: {
+                        maxlength: 1
+                    },
                     value: _SETTINGS.msgAlertSettings.alertDelay
                 });
                 alertTime.onchange = alertTime.oninput = function(e) {
-                    if (e.target.value != '') {
-                        _SETTINGS.msgAlertSettings.alertDelay = e.target.value;
+                    if (/^[0-5]{1}$/i.test(e.target.value)) {
+                        _SETTINGS.msgAlertSettings.alertDelay = parseInt(e.target.value);
                         var jsonSet = JSON.stringify(_SETTINGS);
                         main.setCookie("SP_PLUS_SET", jsonSet, null);
+                        main.setStyle();
+                        alertTime.className = "text-input";
+                    } else {
+                        alertTime.className = "text-input sp-input-error";
                     }
                 };
                 var alertTimeLbl = main.ce("label", {
@@ -3186,19 +3120,23 @@
                     class: "label"
                 });
                 var animTime = main.ce("input", {
-                    type: "number",
+                    type: "text",
                     class: "text-input",
                     size: 4,
-                    min: 1,
-                    max: 9,
+                    attr: {
+                        maxlength: 1
+                    },
                     value: _SETTINGS.msgAlertSettings.animDelay
                 });
                 animTime.onchange = animTime.oninput = function(e) {
-                    if (e.target.value != '') {
-                        _SETTINGS.msgAlertSettings.animDelay = e.target.value;
+                    if (/^[1-9]{1}$/i.test(e.target.value)) {
+                        _SETTINGS.msgAlertSettings.animDelay = parseInt(e.target.value);
                         var jsonSet = JSON.stringify(_SETTINGS);
                         main.setCookie("SP_PLUS_SET", jsonSet, null);
                         main.setStyle();
+                        animTime.className = "text-input";
+                    } else {
+                        animTime.className = "text-input sp-input-error";
                     }
                 };
                 var animTimeLbl = main.ce("label", {
@@ -3222,14 +3160,14 @@
                         if (window.location.href.indexOf(_PROTOCOL + '//' + _DOMAIN + '/mail/message_list/?Contact=' + data.data.contact.nid) != -1) {
                             return false;
                         }
-                        var res = JSON.parse(res);
+                        res = JSON.parse(res);
                         var name;
                         var avatar;
                         var messageKey = Object.keys(res.messages)[0];
                         if (data.data.contact.user != undefined) {
                             if (res.messages[messageKey].contact.avatar == null) {
                                 main.jajax(_PROTOCOL + '//' + _DOMAIN + '/mysite/index/' + data.data.contact.user + '/', function(j) {
-                                    var j = JSON.parse(j);
+                                    j = JSON.parse(j);
                                     avatar = j.owner_widget.photo_widget.previewURL;
                                 });
                             } else {
@@ -3254,24 +3192,23 @@
                                 if (document.getElementsByClassName('mailContainer')[0]) {
                                     div = document.getElementsByClassName('mailContainer')[0];
                                 } else {
-                                    document.body.appendChild(div)
+                                    document.body.appendChild(div);
                                 }
-                                var del
-                                var isClosed = false
-                                var animDelay = _SETTINGS.msgAlertSettings.animDelay * 1000
-                                var alertDelay = _SETTINGS.msgAlertSettings.alertDelay * 1000
-                                var maxAlert = _SETTINGS.msgAlertSettings.maxAlert
-
+                                var del;
+                                var isClosed = false;
+                                var animDelay = _SETTINGS.msgAlertSettings.animDelay * 1000;
+                                var alertDelay = _SETTINGS.msgAlertSettings.alertDelay * 1000;
+                                var maxAlert = _SETTINGS.msgAlertSettings.maxAlert;
                                 var a = main.ce("a", {
                                     class: "mailBox",
                                     href: "#",
                                     id: data.data.nid,
                                     onclick: function() {
                                         if (!isClosed) {
-                                            main.setLocation(_PROTOCOL + '//' + _DOMAIN + '/mail/message_list/?Contact=' + data.data.contact.nid)
-                                            div.removeChild(a)
-                                            isClosed = true
-                                            return false
+                                            main.setLocation(_PROTOCOL + '//' + _DOMAIN + '/mail/message_list/?Contact=' + data.data.contact.nid);
+                                            div.removeChild(a);
+                                            isClosed = true;
+                                            return false;
                                         }
                                     }
                                 });
@@ -3295,14 +3232,14 @@
                                     style: "margin: 5px",
                                     onclick: function() {
                                         if (!isClosed) {
-                                            clearTimeout(del)
-                                            div.removeChild(a)
-                                            isClosed = true
+                                            clearTimeout(del);
+                                            div.removeChild(a);
+                                            isClosed = true;
                                         }
                                     }
                                 });
                                 if (document.querySelectorAll('.mailContainer a').length > maxAlert - 1) {
-                                    div.removeChild(div.firstChild)
+                                    div.removeChild(div.firstChild);
                                 }
                                 gDiv.appendChild(nameDiv);
                                 gDiv.appendChild(textDiv);
@@ -3313,33 +3250,33 @@
                                 if (alertDelay != 0) {
                                     del = setTimeout(function() {
                                         if (document.getElementById(a.id)) {
-                                            isClosed = true
-                                            a.style = 'animation: destroy ' + animDelay / 1000 + 's;'
+                                            isClosed = true;
+                                            a.style = 'animation: destroy ' + animDelay / 1000 + 's;';
                                             setTimeout(function() {
-                                                div.removeChild(a)
-                                            }, animDelay)
+                                                div.removeChild(a);
+                                            }, animDelay);
                                         }
-                                    }, alertDelay)
+                                    }, alertDelay);
                                 }
                             }
-                        }, 500)
+                        }, 500);
                     }, 4, true);
                 }
             },
             preloadModifer: function() {
                 var isFirefox = false;
-                var w = window
+                var w = window;
                 if (typeof(unsafeWindow) != "undefined" && unsafeWindow.Device.browser == 'firefox' && unsafeWindow.Device.type == "desktop") {
-                    w = unsafeWindow
-                    isFirefox = true
+                    w = unsafeWindow;
+                    isFirefox = true;
                 }
                 if (_SETTINGS.msgAlert) {
                     var start = setInterval(function() {
                         if (typeof(w.pushstream._keepConnected) == "boolean" && w.pushstream._keepConnected) {
-                            clearInterval(start)
+                            clearInterval(start);
                             var proxy = new Proxy(w.Spaces.PushStream.prototype._onmessage, {
                                 apply: function(target, targetArgs, args) {
-                                    main.msgAlert(args[0])
+                                    main.msgAlert(args[0]);
                                 }
                             });
                             if (isFirefox) {
@@ -3350,57 +3287,98 @@
                                 w.Spaces.PushStream.prototype._onmessage = proxy;
                             }
                         }
-                    }, 500)
+                    }, 500);
                 }
             },
-            fastAccess: function() {
-                var fastClick = main.find(document.links, {
+            spacesButton: function() {
+                var button = main.qs("#SP_SETTINGS_BUTTON");
+                var target = main.find(document.links, {
                     href: _PROTOCOL + "//" + _DOMAIN + "/services/?"
                 });
-                if (fastClick) {
+                var disableIcons = main.find(document.getElementsByTagName('span'), {
+                    className: "s_i s_i_exit"
+                });
+                if (target && !button) {
                     var setLink = main.ce("li", {
                         class: "li",
-                        html: '<a href="' + _PROTOCOL + '//' + _DOMAIN + '/settings/?sp_plus_settings=1" title="Настройки Spaces+"><span class="sp sp-ico"></span><span class="m s_i_text"> Spaces+</span></a>'
+                        id: "SP_SETTINGS_BUTTON",
+                        html: '<a href="' + _PROTOCOL + '//' + _DOMAIN + '/settings/?sp_plus_settings=1" title="Настройки Spaces+">' + (disableIcons ? '<span class="sp sp-ico"></span>' : '') + '<span class="m s_i_text"> Spaces+</span></a>'
                     });
-                    fastClick = fastClick[0].parentNode;
-                    main.insertAfter(setLink, fastClick);
-                    if (fastClick.nextElementSibling.nodeName == "BR") {
+                    target = target[0].parentNode;
+                    main.insertAfter(setLink, target);
+                    if (target.nextElementSibling.nodeName == "BR") {
                         main.insertAfter(main.ce("br", null), setLink);
                     }
                 }
             },
-            freeSticker: function() {
-                var script = main.qs("#SP_PLUS_STICKER");
-                if (script) {
-                    document.getElementsByTagName('head')[0].removeChild(script);
-                    document.location.reload();
-                } else {
-                    var e = main.ce("script", {
-                        type: "text/javascript",
-                        id: "SP_PLUS_STICKER",
-                        html: 'var open=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(e,o,t){var n=open.apply(this,arguments);return-1==o.indexOf("mail/sendMessage")&&-1==o.indexOf("diary/new")&&-1==o.indexOf("comments/add")||this.setRequestHeader("X-Proxy","spaces"),n};'
-                    });
-                    document.getElementsByTagName('head')[0].appendChild(e);
+            nonRedirect: function() {
+                var urls = main.find(document.links, {
+                    href: _PROTOCOL + "//" + _DOMAIN + "/index/redirect/?"
+                });
+                try {
+                    if (urls) {
+                        for (var i = 0; i < urls.length; i++) {
+                            urls[i].setAttribute("href", urls[i].innerText);
+                        }
+                    }
+                } catch (e) {
+                    main.console.error('Ошибка (NON-REDIRECT): ' + e.name + ":" + e.message + "\n" + e.stack);
                 }
             },
+            freeStickers: function() {
+                var script = main.qs("#SP_PLUS_STICKERS");
+                try {
+                    if (!script) {
+                        var s = main.ce("script", {
+                            type: "text/javascript",
+                            id: "SP_PLUS_STICKERS",
+                            html: 'var open=XMLHttpRequest.prototype.open;XMLHttpRequest.prototype.open=function(e,o,t){var n=open.apply(this,arguments);return-1==o.indexOf("mail/sendMessage")&&-1==o.indexOf("diary/new")&&-1==o.indexOf("comments/add")||this.setRequestHeader("X-Proxy","spaces"),n};'
+                        });
+                        document.getElementsByTagName('head')[0].appendChild(s);
+                    }
+                } catch (e) {
+                    main.console.error('Ошибка (FREE-STICKERS): ' + e.name + ":" + e.message + "\n" + e.stack);
+                }
+            },
+            spacesAPI: function(method, params, callback) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", _PROTOCOL + "//" + _DOMAIN + "/api/" + method, true);
+                if (params) {
+                    xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+                    xhr.send(params);
+                } else {
+                    xhr.send(null);
+                }
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState == 4) {
+                        if (xhr.status == 200) {
+                            callback(xhr.status, xhr.response);
+                        }
+                    } else {
+                        return null;
+                    }
+                };
+            },
             start: function() {
-                if (_SETTINGS.blocked) main.bannedTools();
+                if (_SETTINGS.hrightbar) main.hiddenRightbar();
                 if (_SETTINGS.comments) main.commentsDelete();
-                if (_SETTINGS.blogsd) main.blogsDelete();
                 if (_SETTINGS.readersd) main.readersDelete();
+                if (_SETTINGS.playback) main.videoPlayback();
+                if (_SETTINGS.nredirect) main.nonRedirect();
+                if (_SETTINGS.apidebug) main.apiDebugger();
+                if (_SETTINGS.myEvents) main.soundEvents();
+                if (_SETTINGS.favorite) main.favoriteAdd();
+                if (_SETTINGS.sticker) main.freeStickers();
+                if (_SETTINGS.blocked) main.bannedTools();
                 if (_SETTINGS.online) main.onlineWidget();
+                if (_SETTINGS.blogsd) main.blogsDelete();
+                if (_SETTINGS.rotate) main.rotateMedia();
+                if (_SETTINGS.rscroll) main.scrollMove();
+                if (_SETTINGS.karma) main.karmaAccept();
+                if (_SETTINGS.coins) main.coinsAccept();
                 if (_SETTINGS.fixes) main.allFixes();
                 if (_SETTINGS.ads) main.adsRemove();
-                if (_SETTINGS.favorite) main.favoriteAdd();
-                if (_SETTINGS.rotate) main.rotateMedia();
-                if (_SETTINGS.playback) main.videoPlayback();
                 if (_SETTINGS.friendsOn) main.friendsOnline(1);
-                if (_SETTINGS.rscroll) main.scrollMove(1);
-                if (_SETTINGS.hrightbar) main.hiddenRightbar(1);
-                if (_SETTINGS.coins) main.coinsAccept();
-                if (_SETTINGS.karma) main.karmaAccept();
-                if (_SETTINGS.darkMode) main.darkMode(1);
-                if (_SETTINGS.myEvents) main.soundEvents();
                 if (_SETTINGS.playerdn) {
                     main.playerDown();
                 } else if (!_SETTINGS.playerdn && playerId >= 0) {
@@ -3410,15 +3388,14 @@
                         main.remove(downPlace);
                     }
                 }
+                main.spacesButton();
                 main.settings();
             },
             init: function() {
+                main.spacesUpdater();
                 main.readSettings();
                 main.setStyle();
-                main.update();
                 main.start();
-                main.fastAccess();
-                if (_SETTINGS.sticker) main.freeSticker();
                 var w = setInterval(function() {
                     if (window.Device != undefined || unsafeWindow.Device != undefined) {
                         clearInterval(w);
@@ -3430,7 +3407,20 @@
                 }, 200);
             }
         };
-        main.init();
+        if (main.qs("#main_wrap")) {
+            main.spacesAPI("session/check", null, function(s, r) {
+                r = JSON.parse(r);
+                if (s == 200) {
+                    if (r.code == 00000) {
+                        main.init();
+                    } else {
+                        main.console.info("[S+] Не авторизованы!");
+                    }
+                } else {
+                    main.console.error("[S+] Сайт временно недоступен!");
+                }
+            });
+        }
     }
     spacesPlus();
-})()
+})();

@@ -6,7 +6,7 @@
 // @icon        	https://spaces-dev.github.io/favicon.png
 // @include     	/^(http|https):\/\/(spaces\.ru|spac\.me|spcs\.me|spaces\.im|gdespaces\.com).*$/
 // @match       	*://(spaces.ru|spac.me|spcs.me|spaces.im|gdespaces.com)/*
-// @version     	2.1.9
+// @version     	2.2.0
 // @grant       	none
 // @require         https://spaces-dev.github.io/src/attaches/js/colorpicker.js
 // @downloadURL 	https://spaces-dev.github.io/spaces-plus.user.js
