@@ -6,7 +6,7 @@
 // @icon            https://spaces-dev.github.io/favicon.png
 // @include         /^(http|https):\/\/(spaces\.ru|spac\.me|spcs\.me|spaces\.im|gdespaces\.com|spac1\.com).*$/
 // @match           *://(spaces.ru|spac.me|spcs.me|spaces.im|gdespaces.com|spac1.com)/*
-// @version         2.2.0
+// @version         2.2.1
 // @grant           none
 // @require         https://spaces-dev.github.io/src/attaches/js/colorpicker.js
 // @downloadURL     https://spaces-dev.github.io/spaces-plus.user.js
@@ -17,7 +17,7 @@
     function spacesPlus() {
         var _PROTOCOL = document.location.protocol.toString();
         var _DOMAIN = document.location.hostname.toString();
-        var VERSION = 220;
+        var VERSION = 221;
         var onlineLock = null;
         var favLock = null;
         var favRLock = null;
@@ -31,8 +31,8 @@
         var angleI = 0;
         var angleV = 0;
         var videoPlayback = 1;
-        var gitPages = "spaces-dev.github.io";
-        var ICON48 = "data:image/png;base64,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";
+        var gitPages = 'spaces-dev.github.io';
+        var ICON48 = 'data:image/png;base64,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';
         var _SETTINGS = {
             'comments': false,
             'blogsd': false,
@@ -57,13 +57,13 @@
             'bodystyle': true,
             'upVersion': VERSION,
             'bodystyleSetting': {
-                "url": "https://" + gitPages + "/src/backgrounds/default.jpg",
-                "color": '#DAE1E8',
-                "urlchecked": true,
-                "colorchecked": false
+                'url': 'https://' + gitPages + '/src/backgrounds/default.jpg',
+                'color': '#DAE1E8',
+                'urlchecked': true,
+                'colorchecked': false
             },
             'events': {
-                'url': "https://" + gitPages + "/src/sounds/default.ogg",
+                'url': 'https://' + gitPages + '/src/sounds/default.ogg',
                 'volume': 70,
                 'mail': true,
                 'journal': true,
@@ -79,34 +79,34 @@
             },
             'msgAlert': false,
             'msgAlertSettings': {
-                "alertPosition": 4,
-                "maxAlert": 3,
-                "animDelay": 3,
-                "alertDelay": 3
+                'alertPosition': 4,
+                'maxAlert': 3,
+                'animDelay': 3,
+                'alertDelay': 3
             }
         };
         var _SETSTRINGS = {
-            'comments': "Пакетное удаление комментариев",
-            'blogsd': "Пакетное удаление блогов",
-            'readersd': "Пакетное удаление читателей",
-            'friendsOn': "Панель друзей онлайн",
-            'myEvents': "Звук уведомлений",
-            'online': "Точное время онлайн в анкетах",
-            'ads': "Скрывать рекламу",
-            'favorite': "Возможность добавить пользователя в закладки",
-            'rotate': "Кнопка поворота фото/видео в просмотрщике",
-            'playback': "Кнопка ускорения видео",
-            'playerdn': "Кнопка загрузки трека из плеера",
-            'nredirect': "Внешние ссылки без редиректа",
-            'rscroll': "Прокрутка страницы справа",
-            'hrightbar': "Скрыть правое меню",
-            'blocked': "Открытые разделы удаленных пользователей",
-            'coins': "Собирать бонусные монеты",
-            'karma': "Собирать карму",
-            'bodystyle': "Фон сайта",
-            'msgAlert': "Виджет почты",
-            'sticker': "Бесплатные стикеры",
-            'fixes': "Незначительные исправления"
+            'comments': 'Пакетное удаление комментариев',
+            'blogsd': 'Пакетное удаление блогов',
+            'readersd': 'Пакетное удаление читателей',
+            'friendsOn': 'Панель друзей онлайн',
+            'myEvents': 'Звук уведомлений',
+            'online': 'Точное время онлайн в анкетах',
+            'ads': 'Скрывать рекламу',
+            'favorite': 'Возможность добавить пользователя в закладки',
+            'rotate': 'Кнопка поворота фото/видео в просмотрщике',
+            'playback': 'Кнопка ускорения видео',
+            'playerdn': 'Кнопка загрузки трека из плеера',
+            'nredirect': 'Внешние ссылки без редиректа',
+            'rscroll': 'Прокрутка страницы справа',
+            'hrightbar': 'Скрыть правое меню',
+            'blocked': 'Открытые разделы удаленных пользователей',
+            'coins': 'Собирать бонусные монеты',
+            'karma': 'Собирать карму',
+            'bodystyle': 'Фон сайта',
+            'msgAlert': 'Виджет почты',
+            'sticker': 'Бесплатные стикеры',
+            'fixes': 'Незначительные исправления'
         };
         var main = {
             ajax: function(url, method, data, callback, rstate, json) {
@@ -194,6 +194,18 @@
                     main.console.error('Ошибка (GETPATH): ' + e.name + ":" + e.message + "\n" + e.stack);
                     return null;
                 }
+            },
+            getParams: function(url) {
+                var params = {};
+                var parser = document.createElement('a');
+                parser.href = url;
+                var query = parser.search.substring(1);
+                var vars = query.split('&');
+                for (var i = 0; i < vars.length; i++) {
+                    var pair = vars[i].split('=');
+                    params[pair[0]] = decodeURIComponent(pair[1]);
+                }
+                return params;
             },
             css: function(elem, css) {
                 var tList = css.split(";");
@@ -2735,7 +2747,7 @@
                     if (!script) {
                         var apidebug = main.ce("script", {
                             type: "text/javascript",
-                            html: 'var Arr=[\'<div class="time-block" style="text-align: left; padding: 4px; background: #cddae7; border-bottom: 1px solid #a7b4c7;" id="spaces_api_debugger"><a href="#" id="api_debug-button" style="color: #0e3c87; margin-left: 5px"><span class="ico_cats" style="background-position: -54px -54px;margin: 0 4px -4px 0;"></span> Debugger</a><a href="https://spaces-dev.github.io/api" style="color: #0e3c87; float: right" target="_blank">API Methods</a><div id="api_debug-place" style="display: none; margin-top: 5px"></div></div>\',"append","parent","#navi","debugger"];$(Arr[3])[Arr[2]]()[Arr[1]](Arr[0]),require(Arr[4]);void(0);'
+                            html: 'var Arr=[\'<div class="time-block" style="text-align: left; padding: 4px; background: #cddae7; border-bottom: 1px solid #a7b4c7;" id="spaces_api_debugger"><a href="#" id="api_debug-button" style="color: #0e3c87; margin-left: 5px"><span class="ico_cats" style="background-position: -55px -54px;margin: 0 4px -4px 0;"></span> Debugger</a><a href="https://spaces-dev.github.io/api" style="color: #0e3c87; float: right" target="_blank">API Methods</a><div id="api_debug-place" style="display: none; margin-top: 5px"></div></div>\',"append","parent","#navi","debugger"];$(Arr[3])[Arr[2]]()[Arr[1]](Arr[0]),require(Arr[4]);void(0);'
                         });
                         document.getElementsByTagName('head')[0].appendChild(apidebug);
                     }
@@ -3318,7 +3330,7 @@
                 try {
                     if (urls) {
                         for (var i = 0; i < urls.length; i++) {
-                            urls[i].setAttribute("href", urls[i].innerText);
+                            urls[i].setAttribute("href", main.getParams(urls[i])['redirect']);
                         }
                     }
                 } catch (e) {
