@@ -1442,7 +1442,7 @@
                         return false;
                     }
                 });
-                var beta = main.getCookie("beta");
+                var beta = main.getCookie("sandbox");
                 var sndbeta = main.ce("a", {
                     href: '#',
                     class: "stnd-link stnd-link_arr",
