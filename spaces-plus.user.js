@@ -6,7 +6,7 @@
 // @icon            https://spaces-dev.github.io/favicon.png
 // @include         /^(http|https):\/\/(spaces\.ru|spac\.me|spcs\.me|spaces\.im|gdespaces\.com|spac1\.com).*$/
 // @match           *://(spaces.ru|spac.me|spcs.me|spaces.im|gdespaces.com|spac1.com)/*
-// @version         2.2.1
+// @version         2.2.2
 // @grant           none
 // @require         https://spaces-dev.github.io/src/attaches/js/colorpicker.js
 // @downloadURL     https://spaces-dev.github.io/spaces-plus.user.js
@@ -17,7 +17,9 @@
     function spacesPlus() {
         var _PROTOCOL = document.location.protocol.toString();
         var _DOMAIN = document.location.hostname.toString();
-        var VERSION = 221;
+        var VERSION = 222;
+        var BETA = false;
+        var Device = window.Device || unsafeWindow.Device;
         var onlineLock = null;
         var favLock = null;
         var favRLock = null;
@@ -387,7 +389,7 @@
                                                             }
                                                         } else if (e.target.id == "sp_set_fixes") {
                                                             if (e.target.checked) {
-                                                                main.allFixes();
+                                                                main.tinyFix();
                                                                 main.alert("Незначительные исправления<div class='pad_t_a'></div><small class='pad_t_a grey'>Данная функция необходима для исправления неудачных обновлений сайта.<div class='pad_t_a'></div>Исправлено: <ul><li>Кнопка почты/ленты в шапке</li></ul></div>", 1, 1);
                                                             } else {
                                                                 if (eventAlert) {
@@ -545,7 +547,7 @@
                                                     main.delCookie("SP_PLUS_SET");
                                                     main.delCookie("gp_left_btn");
                                                     main.delCookie("force_ajax_transport");
-                                                    main.delCookie("beta");
+                                                    main.delCookie("sandbox");
                                                     document.location.reload();
                                                 });
                                                 return false;
@@ -1393,7 +1395,7 @@
                                     if (name == "SP_PLUS_SET") {
                                         main.alert("Внимание!<div class='pad_t_a'></div><small>Это служебное значение скрипта, не изменяйте его!</small>", 1, null);
                                     } else if (name != "" && val != "") {
-                                        main.confirmm(name == "SP_PLUS_SET" ? "Внимание, " + name + "</b> является служебным значение скрипта, не стоит его изменять!<br/>" : "" + "Вы действительно хотите задать куке<b>" + name + "</b> значение <b>" + val + "</b>?", 1, function() {
+                                        main.confirmm(name == "SP_PLUS_SET" ? "Внимание, " + name + "</b> является служебным значение скрипта, не стоит его изменять!<br/>" : "" + "Вы действительно хотите задать куке <b>" + name + "</b> значение <b>" + val + "</b>?", 1, function() {
                                             main.setCookie(prev.previousElementSibling.value, prev.value, null);
                                             main.cookieEditor("#SP_PLUS_SETAREA");
                                         });
@@ -1449,9 +1451,9 @@
                     style: "font-size: small;",
                     onclick: function() {
                         if (beta) {
-                            main.delCookie("beta");
+                            main.delCookie("sandbox");
                         } else {
-                            main.setCookie("beta", "1", null);
+                            main.setCookie("sandbox", "beta", null);
                         }
                         document.location.reload();
                         return false;
@@ -2723,22 +2725,19 @@
                     main.console.error('Ошибка (ADBLOCK): ' + e.name + ":" + e.message + "\n" + e.stack);
                 }
             },
-            allFixes: function() {
-                var mail = main.find(document.links, {
-                    href: _PROTOCOL + "//" + _DOMAIN + "/mail/?Link_id="
-                });
-                var lenta = main.find(document.links, {
-                    href: _PROTOCOL + "//" + _DOMAIN + "/lenta/?Link_id="
-                });
-                if (mail && lenta) {
-                    var pmail = mail[0].parentNode;
-                    var plenta = lenta[0].parentNode;
-                    mail[0].href = _PROTOCOL + "//" + _DOMAIN + "/mail/";
-                    lenta[0].href = _PROTOCOL + "//" + _DOMAIN + "/lenta/";
-                    pmail.removeChild(mail[0]);
-                    plenta.removeChild(lenta[0]);
-                    pmail.appendChild(lenta[0]);
-                    plenta.appendChild(mail[0]);
+            tinyFix: function() {
+                try {
+                    var navi = main.find(document.links, {
+                        className: 'horiz-menu__link'
+                    });
+                    if (navi) {
+                        var mail = navi[2].cloneNode(true);
+                        var lenta = navi[4].cloneNode(true);
+                        navi[2].replaceWith(lenta);
+                        navi[4].replaceWith(mail);
+                    }
+                } catch (e) {
+                    main.console.error('Ошибка (TINY-FIX): ' + e.name + ":" + e.message + "\n" + e.stack);
                 }
             },
             apiDebugger: function() {
@@ -3034,7 +3033,7 @@
                         if (_SETTINGS.upVersion) hideVer = parseInt(_SETTINGS.upVersion, 10);
                         VERSION = Math.max(hideVer, VERSION);
                         if (json.history[0].build > VERSION) {
-                            main.alert('Доступна новая версия Spaces+ <sup>' + main.rever(json.history[0].build) + '</sup><div class="pad_t_a"></div><small class="grey">' + json.history[0].changes + '</small><div id="SP_UPDATER_BUTTONS" class="pad_t_a"><a class="btn btn_green btn_input" href="http://' + gitPages + '/spaces-plus.user.js?r=' + main.service(1) + '" onclick="document.body.removeChild(this.parentNode.parentNode.parentNode); return true;" target="_blank"> Обновить</a></div>', 1, 1);
+                            main.alert('Доступна новая версия Spaces+ <sup>' + main.rever(json.history[0].build) + '</sup><div class="pad_t_a"></div><small class="grey">' + json.history[0].changes + '</small><div id="SP_UPDATER_BUTTONS" class="pad_t_a"><a class="btn btn_green btn_input" href="https://github.com/spaces-dev/' + gitPages + '/raw/master/spaces-plus.user.js?r=' + main.service(1) + '" onclick="document.body.removeChild(this.parentNode.parentNode.parentNode); return true"> Обновить</a></div>', 1, 1);
                             if (main.qs("#SP_PLUS_ALERT")) {
                                 var hide = main.ce("a", {
                                     href: "#",
@@ -3371,6 +3370,50 @@
                     }
                 };
             },
+            userStatus: function(code) {
+                try {
+                    var notAuthorized = main.ce('div', {
+                        html: 'Для работы <b>Spaces+</b> необходима авторизация!'
+                    });
+                    if ((Device.id == 3 || Device.id == 4) && code == '01001') {
+                        var message = main.ce('div', {
+                            class: 'oh nl system-message',
+                            style: 'border: 1px solid #ff9a95;background: #fdf3ef'
+                        });
+                        message.prepend(notAuthorized);
+                        main.qs('#top_info_block').prepend(message);
+                    } else if (Device.id == 1 || Device.id == 2) {
+                        var unSupported = main.ce('div', {
+                            class: 'oh busi',
+                            style: 'border: 1px solid #ff9a95;background: #fdf3ef',
+                            html: 'Используемая версия сайта не поддерживается для работы <b>Spaces+</b>'
+                        });
+                        if (code == '01001') unSupported.prepend(notAuthorized);
+                        main.qs('#main_wrap').prepend(unSupported);
+                        return false;
+                    } else {
+                        return true;
+                    }
+                } catch (e) {
+                    main.console.error('Ошибка (USER-STATUS): ' + e.name + ":" + e.message + "\n" + e.stack);
+                }
+            },
+            easyBeta: function() {
+                var progress_label = main.find(document.getElementsByTagName('div'), {
+                    className: 'progress-item__label'
+                });
+                var progress_runner = main.find(document.getElementsByTagName('div'), {
+                    className: 'progress-item__runner'
+                });
+                if (progress_label && progress_runner) {
+                    var item = progress_label[0].textContent.split('/');
+                    var summ = Math.round(Number(item[0]) / Number(item[1]) * 100);
+                    if (summ > 30) {
+                        progress_label[0].style = 'color: #f5f5f5';
+                    }
+                    progress_runner[0].style = 'width: ' + summ + '%';
+                }
+            },
             start: function() {
                 if (_SETTINGS.hrightbar) main.hiddenRightbar();
                 if (_SETTINGS.comments) main.commentsDelete();
@@ -3388,7 +3431,6 @@
                 if (_SETTINGS.rscroll) main.scrollMove();
                 if (_SETTINGS.karma) main.karmaAccept();
                 if (_SETTINGS.coins) main.coinsAccept();
-                if (_SETTINGS.fixes) main.allFixes();
                 if (_SETTINGS.ads) main.adsRemove();
                 if (_SETTINGS.friendsOn) main.friendsOnline(1);
                 if (_SETTINGS.playerdn) {
@@ -3400,16 +3442,18 @@
                         main.remove(downPlace);
                     }
                 }
+                if (BETA) main.easyBeta();
                 main.spacesButton();
                 main.settings();
             },
             init: function() {
+                if (_SETTINGS.fixes) main.tinyFix();
                 main.spacesUpdater();
                 main.readSettings();
                 main.setStyle();
                 main.start();
                 var w = setInterval(function() {
-                    if (window.Device != undefined || unsafeWindow.Device != undefined) {
+                    if (Device != undefined) {
                         clearInterval(w);
                         main.preloadModifer();
                     }
@@ -3422,15 +3466,7 @@
         if (main.qs("#main_wrap")) {
             main.spacesAPI("session/check", null, function(s, r) {
                 r = JSON.parse(r);
-                if (s == 200) {
-                    if (r.code == 00000) {
-                        main.init();
-                    } else {
-                        main.console.info("[S+] Не авторизованы!");
-                    }
-                } else {
-                    main.console.error("[S+] Сайт временно недоступен!");
-                }
+                if (s == 200 && main.userStatus(r.code)) main.init();
             });
         }
     }
