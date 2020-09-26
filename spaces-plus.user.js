@@ -6,7 +6,7 @@
 // @icon            https://spaces-dev.github.io/favicon.png
 // @include         /^(http|https):\/\/(spaces\.ru|spac\.me|spcs\.me|spaces\.im|gdespaces\.com|spac1\.com|spac1\.net).*$/
 // @match           *://(spaces.ru|spac.me|spcs.me|spaces.im|gdespaces.com|spac1.com|spac1.net)/*
-// @version         2.2.3
+// @version         2.2.4
 // @grant           none
 // @require         https://spaces-dev.github.io/src/attaches/js/colorpicker.js
 // @downloadURL     https://spaces-dev.github.io/spaces-plus.user.js
@@ -17,7 +17,7 @@
     function spacesPlus() {
         var _PROTOCOL = document.location.protocol.toString();
         var _DOMAIN = document.location.hostname.toString();
-        var VERSION = 223;
+        var VERSION = 224;
         var BETA = false;
         var Device = window.Device || unsafeWindow.Device;
         var onlineLock = null;
@@ -1500,7 +1500,7 @@
                     class: "stnd-link stnd-link_arr sp_line",
                     html: "<span class='b'><span class='sp sp-remove-grey'></span> Скрыть квест новичка<span class='ico ico_arr ico_m'></span></span>",
                     onclick: function() {
-                        var CK = main.getCK(0);
+                        var CK = main.getCK();
                         main.confirmm("Вы действительно хотите скрыть квест новичка?", 0, function() {
                             main.ajax(_PROTOCOL + "//" + _DOMAIN + "/newbequest/?CK=" + CK, "GET", null, function() {
                                 main.alert("Успех!<div class='pad_t_a'></div><small>Квест новичка скрыт</small>", 1, null);
@@ -2122,9 +2122,11 @@
                     return null;
                 }
             },
-            getCK: function(a) {
-                var Sid = main.getCookie("sid");
-                return a ? Sid : Sid.substr(-4);
+            getCK: function() {
+                var logout = main.find(document.links, {
+                    href: _PROTOCOL + "//" + _DOMAIN + "/logout/?"
+                });
+                return main.getParams(logout[0].href)["CK"];
             },
             allCookie: function() {
                 var obj = new Object();
@@ -2184,7 +2186,7 @@
                             href: _PROTOCOL + "//" + _DOMAIN + "/lenta/reader_delete/?"
                         });
                         if (edLinks && !main.qs("#SP_PLUS_BOTTOM_DIVB")) {
-                            var CK = main.getCK(0);
+                            var CK = main.getCK();
                             var chbxArr = new Array();
                             for (var i in edLinks) {
                                 edLinks[i].style.textAlign = "center";
@@ -2299,7 +2301,7 @@
                             href: _PROTOCOL + "//" + _DOMAIN + "/diary/editaccess/?Link_id="
                         });
                         if (edLinks && !main.qs("#SP_PLUS_BOTTOM_DIVB")) {
-                            var CK = main.getCK(0);
+                            var CK = main.getCK();
                             var chbxArr = new Array();
                             for (var i = 0; i < edLinks.length; i++) {
                                 if (edLinks[i].className) {
