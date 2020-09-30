@@ -6,7 +6,7 @@
 // @icon            https://spaces-dev.github.io/favicon.png
 // @include         /^(http|https):\/\/(spaces\.ru|spac\.me|spcs\.me|spaces\.im|gdespaces\.com|spac1\.com|spac1\.net).*$/
 // @match           *://(spaces.ru|spac.me|spcs.me|spaces.im|gdespaces.com|spac1.com|spac1.net)/*
-// @version         2.2.4
+// @version         2.2.5
 // @grant           none
 // @require         https://spaces-dev.github.io/src/attaches/js/colorpicker.js
 // @downloadURL     https://spaces-dev.github.io/spaces-plus.user.js
@@ -17,7 +17,7 @@
     function spacesPlus() {
         var _PROTOCOL = document.location.protocol.toString();
         var _DOMAIN = document.location.hostname.toString();
-        var VERSION = 224;
+        var VERSION = 225;
         var BETA = false;
         var Device = window.Device || unsafeWindow.Device;
         var onlineLock = null;
@@ -2878,7 +2878,7 @@
                                         var _json = {
                                             'result': {
                                                 'valid': 0,
-                                                'jsoncopy': "",
+                                                'data': "",
                                                 'errors': {
                                                     'code': 0,
                                                     'message': "",
@@ -2913,7 +2913,7 @@
                                 var _json = {
                                     'result': {
                                         'valid': 0,
-                                        'jsoncopy': "",
+                                        'data': "",
                                         'errors': {
                                             'code': 0,
                                             'message': "",
@@ -2927,7 +2927,7 @@
                                     id: "SP_BACKUP_JSON",
                                     cols: "17",
                                     rows: "53",
-                                    html: json.result.jsoncopy
+                                    html: json.result.data
                                 });
                                 if (json.result.valid == 1) {
                                     target.appendChild(wrap);
