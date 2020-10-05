@@ -88,7 +88,7 @@
             },
             'weatherWidget': false,
             'weatherSettings': {
-                'interval': 36000,
+                'interval': 600,
                 'time': 0,
                 'city': null,
                 'language': 'ru',
@@ -3542,7 +3542,7 @@
                 var widget = main.qs("#SP_WIDGET_WEATHER");
                 var page_rightbar = main.qs("#page_rightbar");
 
-                if (main.unixTime() - _SETTINGS.weatherSettings.time > _SETTINGS.weatherWidget.interval && _SETTINGS.weatherSettings.city != null) {
+                if (_SETTINGS.weatherSettings.time - main.unixTime() > _SETTINGS.weatherWidget.interval && _SETTINGS.weatherSettings.city != null) {
                     main.getWeather();
                 }
 
