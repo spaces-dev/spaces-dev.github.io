@@ -1,6 +1,11 @@
 {
 	"history": [
 		{
+			"build": "230",
+			"date": "06.10.2020",
+			"changes": "<b>\u041D\u043E\u0432\u043E\u0435:</b></br><ul class='list'><li>\u0412\u0438\u0434\u0436\u0435\u0442 \u043F\u043E\u0433\u043E\u0434\u044B</li></ul><b>\u0418\u0441\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u043E:</b></br><ul class='list'><li>\u0412\u044B\u0431\u043E\u0440\u043A\u0430 \u0446\u0432\u0435\u0442\u0430 \u0438 \u0444\u043E\u043D\u0430</li></ul>"
+		},
+		{
 			"build": "225",
 			"date": "30.09.2020",
 			"changes": "<b>\u0418\u0441\u043F\u0440\u0430\u0432\u043B\u0435\u043D\u043E:</b></br><ul class='list'><li>\u0412 \u043D\u0430\u0441\u0442\u0440\u043E\u0439\u043A\u0430\u0445 \u0438\u0441\u043F\u0440\u0430\u0432\u043B\u0435\u043D <a href='https://spaces.im/settings/?sp_plus_settings=1&sp_backup=1' target='_blank'>\u0418\u043C\u043F\u043E\u0440\u0442 \u0438 \u044D\u043A\u0441\u043F\u043E\u0440\u0442 \u043D\u0430\u0441\u0442\u0440\u043E\u0435\u043A</a></li></ul>"

@@ -6,7 +6,7 @@
 // @icon            https://spaces-dev.github.io/favicon.png
 // @include         /^(http|https):\/\/(spaces\.ru|spac\.me|spcs\.me|spaces\.im|gdespaces\.com|spac1\.com|spac1\.net).*$/
 // @match           *://(spaces.ru|spac.me|spcs.me|spaces.im|gdespaces.com|spac1.com|spac1.net)/*
-// @version         2.2.5
+// @version         2.3.0
 // @grant           none
 // @require         https://spaces-dev.github.io/src/attaches/js/colorpicker.js
 // @downloadURL     https://spaces-dev.github.io/spaces-plus.user.js
@@ -17,7 +17,7 @@
     function spacesPlus() {
         var _PROTOCOL = document.location.protocol.toString();
         var _DOMAIN = document.location.hostname.toString();
-        var VERSION = 225;
+        var VERSION = 230;
         var BETA = false;
         var Device = window.Device || unsafeWindow.Device;
         var onlineLock = null;
@@ -85,6 +85,15 @@
                 'maxAlert': 3,
                 'animDelay': 3,
                 'alertDelay': 3
+            },
+            'weatherWidget': false,
+            'weatherSettings': {
+                'interval': 36000,
+                'time': 0,
+                'city': null,
+                'language': 'ru',
+                'units': 'metric',
+                'key': '5f11ea40424990937175d20a072e0c72'
             }
         };
         var _SETSTRINGS = {
@@ -107,6 +116,7 @@
             'karma': 'Собирать карму',
             'bodystyle': 'Фон сайта',
             'msgAlert': 'Виджет почты',
+            'weatherWidget': 'Виджет погоды',
             'sticker': 'Бесплатные стикеры',
             'fixes': 'Незначительные исправления'
         };
@@ -128,10 +138,14 @@
                     if (xhr.readyState == rstate) {
                         if (xhr.status == 200) {
                             if (callback) {
-                                callback(xhr.responseText);
+                                callback(xhr.status, xhr.responseText);
                             }
                         } else {
-                            return false;
+                            if (callback) {
+                                callback(xhr.status, xhr.responseText);
+                            } else {
+                                return false;
+                            }
                         }
                     }
                 };
@@ -381,6 +395,15 @@
                                                                     main.remove(msgAS);
                                                                 }
                                                             }
+                                                        } else if (e.target.id == "sp_set_weatherWidget") {
+                                                            if (e.target.checked) {
+                                                                main.weatherSettings(e.target);
+                                                            } else {
+                                                                var spWW = main.qs("#SP_WIDGET_WEATHER");
+                                                                var spWS = main.qs("#SP_WEATHER_SETTINGS");
+                                                                if (spWW) main.remove(spWW);
+                                                                if (spWS) main.remove(spWS);
+                                                            }
                                                         } else if (e.target.id == "sp_set_sticker") {
                                                             if (e.target.checked) {
                                                                 main.freeStickers();
@@ -428,6 +451,9 @@
                                         }
                                         if (_SETTINGS.msgAlert) {
                                             main.msgAlertSettings(main.qs("#sp_set_msgAlert"));
+                                        }
+                                        if (_SETTINGS.weatherWidget) {
+                                            main.weatherSettings(main.qs("#sp_set_weatherWidget"));
                                         }
                                         var spActLbl = main.ce("div", {
                                             class: "sp_plus_line",
@@ -744,6 +770,7 @@
                     });
                     var bstyle = main.ce("input", {
                         type: "text",
+                        id: "image-input",
                         value: _SETTINGS.bodystyleSetting.url,
                         style: "margin-bottom: 7px;",
                         class: "text-input"
@@ -762,7 +789,7 @@
                     var bstylec = main.ce("input", {
                         type: "text",
                         class: "text-input",
-                        id: 'color-input',
+                        id: "color-input",
                         value: _SETTINGS.bodystyleSetting.color
                     });
                     bstylec.onchange = bstylec.oninput = function(a) {
@@ -934,7 +961,7 @@
                             picker.enter();
                             picker.set(_SETTINGS.bodystyleSetting.color);
                             picker.on("change", function(color) {
-                                document.getElementsByClassName("text-input")[3].value = '#' + color;
+                                document.getElementById("color-input").value = '#' + color;
                                 document.querySelector("input[name=color]").value = '#' + color;
                                 document.getElementsByClassName("colorpicker-color")[0].style.backgroundColor = '#' + color;
                                 _SETTINGS.bodystyleSetting.color = '#' + color;
@@ -946,7 +973,7 @@
                             for (var i = 0; i < colors.length; i++) {
                                 colors[i].onclick = function(e) {
                                     var color = e.target.getAttribute('data-val');
-                                    document.getElementsByClassName("text-input")[3].value = color;
+                                    document.getElementById("color-input").value = color;
                                     document.querySelector("input[name=color]").value = color;
                                     document.getElementsByClassName("colorpicker-color")[0].style.backgroundColor = color;
                                     _SETTINGS.bodystyleSetting.color = color;
@@ -985,7 +1012,7 @@
                         var gd = main.ce("div", {
                             class: "js-gallery_skip wbg oh tiles_block tiles_wrapper"
                         });
-                        main.ajax('https://' + gitPages + '/data.json?r=' + rev, 'GET', null, function(data) {
+                        main.ajax('https://' + gitPages + '/data.json?r=' + rev, 'GET', null, function(s, data) {
                             var data = JSON.parse(data);
                             for (var i = 0; i < data.backgrounds.length; i++) {
                                 var d1 = main.ce("div", {
@@ -1006,7 +1033,7 @@
                                     style: "cursor: pointer;",
                                     src: data.backgrounds[i].url,
                                     onclick: function(e) {
-                                        document.getElementsByClassName('text-input')[2].value = e.target.src;
+                                        document.getElementById("image-input").value = e.target.src;
                                         _SETTINGS.bodystyleSetting.url = e.target.src;
                                         var jsonSet = JSON.stringify(_SETTINGS);
                                         main.setCookie("SP_PLUS_SET", jsonSet, null);
@@ -2122,6 +2149,12 @@
                     return null;
                 }
             },
+            unixTime: function() {
+                return Math.round(new Date().getTime() / 1000.0);
+            },
+            toUpper: function(str) {
+                return str[0].toUpperCase() + str.substring(1);
+            },
             getCK: function() {
                 var logout = main.find(document.links, {
                     href: _PROTOCOL + "//" + _DOMAIN + "/logout/?"
@@ -2873,7 +2906,7 @@
                             html: '<span class="sp sp-ok-blue"></span><span style="color: #57A3EA;">Сохранить</span>',
                             onclick: function() {
                                 var params = 'value=' + textarea.value;
-                                main.ajax("https://crashmax.ru/api/getJSON", "POST", params, function(r) {
+                                main.ajax("https://crashmax.ru/api/getJSON", "POST", params, function(s, r) {
                                     if (r) {
                                         var _json = {
                                             'result': {
@@ -2908,7 +2941,7 @@
                             }
                         });
                         var params = 'value=' + JSON.stringify(_SETTINGS);
-                        main.ajax("https://crashmax.ru/api/getJSON", "POST", params, function(r) {
+                        main.ajax("https://crashmax.ru/api/getJSON", "POST", params, function(s, r) {
                             if (r) {
                                 var _json = {
                                     'result': {
@@ -2926,7 +2959,7 @@
                                     class: "text-input",
                                     id: "SP_BACKUP_JSON",
                                     cols: "17",
-                                    rows: "53",
+                                    rows: "61",
                                     html: json.result.data
                                 });
                                 if (json.result.valid == 1) {
@@ -2984,7 +3017,7 @@
                         wrap.appendChild(container);
                         target.appendChild(wrap);
                         wrap.appendChild(preloader);
-                        main.ajax("https://" + gitPages + "/updater.json?r=" + main.service(1), "GET", null, function(r) {
+                        main.ajax("https://" + gitPages + "/updater.json?r=" + main.service(1), "GET", null, function(s, r) {
                             if (r) {
                                 var _json = {
                                     'history': {
@@ -3017,7 +3050,7 @@
                 }
             },
             spacesUpdater: function() {
-                main.ajax("https://" + gitPages + "/updater.json?r=" + main.service(1), "GET", null, function(r) {
+                main.ajax("https://" + gitPages + "/updater.json?r=" + main.service(1), "GET", null, function(s, r) {
                     if (r) {
                         var _json = {
                             'history': {
@@ -3165,7 +3198,7 @@
             msgAlert: function(data) {
                 if (data.act == 1) {
                     params = 'Contact=' + data.data.contact.nid + '&MeSsages=' + data.data.nid + '&Pag=0&_origin=' + encodeURI(_PROTOCOL + '//' + _DOMAIN) + '&method=getMessagesByIds';
-                    main.ajax(_PROTOCOL + '//' + _DOMAIN + '/neoapi/mail', 'POST', params, function(res) {
+                    main.ajax(_PROTOCOL + '//' + _DOMAIN + '/neoapi/mail', 'POST', params, function(s, res) {
                         if (window.location.href.indexOf(_PROTOCOL + '//' + _DOMAIN + '/mail/message_list/?Contact=' + data.data.contact.nid) != -1) {
                             return false;
                         }
@@ -3412,7 +3445,135 @@
                     progress_runner[0].style = 'width: ' + summ + '%';
                 }
             },
+            weatherSettings: function(e) {
+                if (_SETTINGS.hrightbar) {
+                    alert("Отключите пункт настроект «‎Скрыть правое меню» для работы виджета!");
+                }
+
+                if (_SETTINGS.weatherSettings.city == null) {
+                    main.ajax("https://ipwhois.app/json/", "GET", null, function(s, r) {
+                        var json = JSON.parse(r);
+
+                        _SETTINGS.weatherSettings.city = json.city;
+                        var jsonSet = JSON.stringify(_SETTINGS);
+                        main.setCookie("SP_PLUS_SET", jsonSet, null);
+                        main.getWeather();
+                    })
+                }
+
+                var masWarp = main.ce("div", {
+                    id: "SP_WEATHER_SETTINGS",
+                    style: "padding: 11px 15px"
+                });
+                var apiKey = main.ce("input", {
+                    type: "text",
+                    class: "text-input",
+                    style: "margin-bottom: 7px",
+                    size: "32",
+                    id: "key-input",
+                    value: _SETTINGS.weatherSettings.key
+                });
+                var locationLbl = main.ce("label", {
+                    html: 'API-Ключ:<div class="label__desc"><a href="https://openweathermap.org/appid" target="_blank">Получить ключ</a></div>',
+                    class: "label"
+                });
+                apiKey.onchange = apiKey.input = function(e) {
+                    if (/^[a-f0-9]{32}$/i.test(e.target.value) || main.trim(e.target.value) == "") {
+                        main.getWeather(null, e.target.value);
+                        apiKey.className = "text-input";
+                    } else {
+                        apiKey.className = "text-input sp-input-error";
+                    }
+                };
+                var cityLbl = main.ce("label", {
+                    html: 'Город:',
+                    class: "label"
+                });
+                var cityInp = main.ce("input", {
+                    type: "text",
+                    class: "text-input",
+                    style: "margin-bottom: 7px",
+                    size: "32",
+                    id: "city-input",
+                    value: _SETTINGS.weatherSettings.city
+                });
+                cityInp.onchange = cityInp.input = function(e) {
+                    if (/^([a-zA-Zа-яА-ЯёЁ]+[-]?[a-zA-Zа-яА-ЯёЁ]*[-]?[a-zA-Zа-яА-ЯёЁ]*[-]?[a-zA-Zа-яА-ЯёЁ]*)$/i.test(e.target.value) || main.trim(e.target.value) == "") {
+                        main.getWeather(e.target.value, null);
+                        cityInp.className = "text-input";
+                    } else {
+                        cityInp.className = "text-input sp-input-error";
+                    }
+                };
+
+                masWarp.appendChild(cityLbl);
+                masWarp.appendChild(cityInp);
+                masWarp.appendChild(locationLbl);
+                masWarp.appendChild(apiKey);
+                main.insertAfter(masWarp, e.parentNode);
+            },
+            getWeather: function(city, key) {
+                var w = _SETTINGS.weatherSettings;
+
+                try {
+                    var url = `https://api.openweathermap.org/data/2.5/weather?lang=${w.language}&units=${w.units}&q=${city == null ? w.city : city}&appid=${key == null ? w.key : key}`;
+                    main.ajax(url, "GET", null, function(s, r) {
+                        var json = JSON.parse(r);
+                        if (json.cod == 200) {
+                            document.getElementById("key-input").value = key == null ? w.key : key;
+                            document.getElementById("city-input").value = json.name;
+                            _SETTINGS.weatherSettings.time = main.unixTime();
+                            _SETTINGS.weatherSettings.city = json.name;
+                            var jsonSet = JSON.stringify(_SETTINGS);
+                            var jsonSet2 = JSON.stringify(json);
+                            main.setCookie("SP_PLUS_SET", jsonSet, null);
+                            main.setCookie("SP_WEATHER", jsonSet2, null);
+                            var wd = main.qs("#SP_WIDGET_WEATHER");
+                            wd.remove();
+                        } else {
+                            alert(json.message);
+                        }
+                    })
+                } catch (e) {
+                    main.console.error('Ошибка (GET-WEATHER): ' + e.name + ":" + e.message + "\n" + e.stack);
+                }
+            },
+            weatherWidget: function() {
+                var widget = main.qs("#SP_WIDGET_WEATHER");
+                var page_rightbar = main.qs("#page_rightbar");
+
+                if (main.unixTime() - _SETTINGS.weatherSettings.time > _SETTINGS.weatherWidget.interval && _SETTINGS.weatherSettings.city != null) {
+                    main.getWeather();
+                }
+
+                try {
+                    if (!widget && page_rightbar) {
+                        w = JSON.parse(main.getCookie("SP_WEATHER"));
+                        var widgets_group = main.ce("div", {
+                            class: "widgets-group_top js-container__block",
+                            style: "box-shadow: 0px 3px 5px rgba(93,109,157,0.3)",
+                            id: "SP_WIDGET_WEATHER"
+                        });
+                        var widget_header = main.ce("div", {
+                            class: "b-title cl b-title_first oh",
+                            html: '<a href="https://openweathermap.org/city/' + w.id + '" target="_blank" class="b-title__link"><h6 class="span">Погода в г. ' + w.name + '</h6></span></a>'
+                        });
+                        var content = main.ce("div", {
+                            class: "content",
+                            style: "padding: 0px 16px 16px 16px",
+                            html: '<img src="https://openweathermap.org/img/wn/' + w.weather[0].icon + '@2x.png" style="display: block; margin-left: auto; margin-right: auto"><div class="grey" style="text-align: center; font-size: 18px"><p>' + Math.round(w.main.temp, 2) + '°C</p><p>' + main.toUpper(w.weather[0].description) + '</p></div><table style="padding-top: 12px" class="grey"><tbody><tr><td>Облачность: </td><td>' + w.clouds.all + '%</td></tr><tr><td>Влажность: </td><td>' + w.main.humidity + '%</td></tr><tr><td>Давление: </td><td>' + Math.round(w.main.pressure * 0.75, 1) + 'mmHg</td></tr><tr><td>Ветер: </td><td>' + w.wind.speed + 'm/sec</td></tr></tbody></table>'
+                        });
+
+                        widgets_group.appendChild(widget_header);
+                        widgets_group.appendChild(content);
+                        page_rightbar.appendChild(widgets_group);
+                    }
+                } catch (e) {
+                    main.console.error('Ошибка (WEATHER-WIDGET): ' + e.name + ":" + e.message + "\n" + e.stack);
+                }
+            },
             start: function() {
+                if (_SETTINGS.weatherWidget) main.weatherWidget();
                 if (_SETTINGS.hrightbar) main.hiddenRightbar();
                 if (_SETTINGS.comments) main.commentsDelete();
                 if (_SETTINGS.readersd) main.readersDelete();
