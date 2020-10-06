@@ -6,7 +6,7 @@
 // @icon            https://spaces-dev.github.io/favicon.png
 // @include         /^(http|https):\/\/(spaces\.ru|spac\.me|spcs\.me|spaces\.im|gdespaces\.com|spac1\.com|spac1\.net).*$/
 // @match           *://(spaces.ru|spac.me|spcs.me|spaces.im|gdespaces.com|spac1.com|spac1.net)/*
-// @version         2.3.0
+// @version         2.3.1
 // @grant           none
 // @require         https://spaces-dev.github.io/src/attaches/js/colorpicker.js
 // @downloadURL     https://spaces-dev.github.io/spaces-plus.user.js
@@ -17,7 +17,7 @@
     function spacesPlus() {
         var _PROTOCOL = document.location.protocol.toString();
         var _DOMAIN = document.location.hostname.toString();
-        var VERSION = 230;
+        var VERSION = 231;
         var BETA = false;
         var Device = window.Device || unsafeWindow.Device;
         var onlineLock = null;
@@ -30,8 +30,7 @@
         var friendsForce = 0;
         var playerId = -1;
         var reCount = 0;
-        var angleI = 0;
-        var angleV = 0;
+        var angle = 0;
         var videoPlayback = 1;
         var gitPages = 'spaces-dev.github.io';
         var ICON48 = 'data:image/png;base64,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';
@@ -105,7 +104,7 @@
             'online': 'Точное время онлайн в анкетах',
             'ads': 'Скрывать рекламу',
             'favorite': 'Возможность добавить пользователя в закладки',
-            'rotate': 'Кнопка поворота фото/видео в просмотрщике',
+            'rotate': 'Кнопка поворота фото в просмотрщике',
             'playback': 'Кнопка ускорения видео',
             'playerdn': 'Кнопка загрузки трека из плеера',
             'nredirect': 'Внешние ссылки без редиректа',
@@ -1937,10 +1936,10 @@
             },
             rotateMedia: function() {
                 var Image = main.qs("#gallery-container");
-                var Video = main.qs("#galleryVideo");
                 var Rotate = main.qs("#SP_IMAGE_ROTATE");
+                var Video = main.qs(".player-dummy_wrap");
                 try {
-                    if (Image != null && Rotate == null && Video) {
+                    if (Image != null && Rotate == null && !Video) {
                         var target_button = main.qs("#g_dloadlink");
                         var button_rotate = main.ce("a", {
                             class: "gallery__tools_button",
@@ -1948,22 +1947,8 @@
                             title: "Повернуть",
                             html: "<span class='ico_gallery ico_gallery_reload m'></span>",
                             onclick: function() {
-                                var beta = main.getCookie("sandbox");
-                                var ImageOrVideo = main.find(Image.getElementsByTagName("img"), {
-                                    src: _PROTOCOL + "//" + beta == 1 ? "beta.spac.me" : "spac.me" + "/i/pixel.png"
-                                });
-                                if (ImageOrVideo != null) {
-                                    if (!Player) {
-                                        angleI = (angleI + 90) % 360;
-                                        Image.className = "accel-3d rotate" + angleI;
-                                    } else {
-                                        angleV = (angleV + 90) % 360;
-                                        Player[0].className = "jwvideo rotate" + angleV;
-                                    }
-                                } else {
-                                    angleI = (angleI + 90) % 360;
-                                    Image.className = "accel-3d rotate" + angleI;
-                                }
+                                angle = (angle + 90) % 360;
+                                Image.className = "accel-3d rotate" + angle;
                                 return false;
                             }
                         });
@@ -3429,7 +3414,7 @@
                     main.console.error('Ошибка (USER-STATUS): ' + e.name + ":" + e.message + "\n" + e.stack);
                 }
             },
-            easyBeta: function() {
+            unconfirmedFeatures: function() {
                 var progress_label = main.find(document.getElementsByTagName('div'), {
                     className: 'progress-item__label'
                 });
@@ -3512,7 +3497,7 @@
                 masWarp.appendChild(apiKey);
                 main.insertAfter(masWarp, e.parentNode);
             },
-            getWeather: function(city, key) {
+            getWeather: function(city = null, key = null) {
                 var w = _SETTINGS.weatherSettings;
 
                 try {
@@ -3522,12 +3507,9 @@
                         if (json.cod == 200) {
                             document.getElementById("key-input").value = key == null ? w.key : key;
                             document.getElementById("city-input").value = json.name;
-                            _SETTINGS.weatherSettings.time = main.unixTime();
-                            _SETTINGS.weatherSettings.city = json.name;
-                            var jsonSet = JSON.stringify(_SETTINGS);
-                            var jsonSet2 = JSON.stringify(json);
-                            main.setCookie("SP_PLUS_SET", jsonSet, null);
-                            main.setCookie("SP_WEATHER", jsonSet2, null);
+                            w.city = json.name;
+                            main.setCookie("SP_PLUS_SET", JSON.stringify(_SETTINGS), null);
+                            main.setCookie("SP_WEATHER", JSON.stringify(json), null);
                             var wd = main.qs("#SP_WIDGET_WEATHER");
                             wd.remove();
                         } else {
@@ -3542,7 +3524,8 @@
                 var widget = main.qs("#SP_WIDGET_WEATHER");
                 var page_rightbar = main.qs("#page_rightbar");
 
-                if (main.unixTime() - _SETTINGS.weatherSettings.time > _SETTINGS.weatherWidget.interval && _SETTINGS.weatherSettings.city != null) {
+                if (main.unixTime() - _SETTINGS.weatherSettings.time > _SETTINGS.weatherSettings.interval && _SETTINGS.weatherSettings.city != null) {
+                    _SETTINGS.weatherSettings.time = main.unixTime();
                     main.getWeather();
                 }
 
@@ -3561,7 +3544,7 @@
                         var content = main.ce("div", {
                             class: "content",
                             style: "padding: 0px 16px 16px 16px",
-                            html: '<img src="https://openweathermap.org/img/wn/' + w.weather[0].icon + '@2x.png" style="display: block; margin-left: auto; margin-right: auto"><div class="grey" style="text-align: center; font-size: 18px"><p>' + Math.round(w.main.temp, 2) + '°C</p><p>' + main.toUpper(w.weather[0].description) + '</p></div><table style="padding-top: 12px" class="grey"><tbody><tr><td>Облачность: </td><td>' + w.clouds.all + '%</td></tr><tr><td>Влажность: </td><td>' + w.main.humidity + '%</td></tr><tr><td>Давление: </td><td>' + Math.round(w.main.pressure * 0.75, 1) + 'mmHg</td></tr><tr><td>Ветер: </td><td>' + w.wind.speed + 'm/sec</td></tr></tbody></table>'
+                            html: '<img src="https://openweathermap.org/img/wn/' + w.weather[0].icon + '@2x.png" style="display: block; margin-left: auto; margin-right: auto"><div class="grey" style="text-align: center; font-size: 18px"><p>' + Math.round(w.main.temp, 2) + '°C</p><p>' + main.toUpper(w.weather[0].description) + '</p></div><table style="padding-top: 6px" class="grey sp-w-table"><tbody><tr><td>Облачность: </td><td style="text-align: right">' + w.clouds.all + '%</td></tr><tr><td>Влажность: </td><td style="text-align: right">' + w.main.humidity + '%</td></tr><tr><td>Давление: </td><td style="text-align: right">' + Math.round(w.main.pressure * 0.75, 1) + 'mmHg</td></tr><tr><td>Ветер: </td><td style="text-align: right">' + w.wind.speed + 'm/sec</td></tr></tbody></table>'
                         });
 
                         widgets_group.appendChild(widget_header);
@@ -3601,7 +3584,7 @@
                         main.remove(downPlace);
                     }
                 }
-                if (BETA) main.easyBeta();
+                if (BETA) main.unconfirmedFeatures();
                 main.spacesButton();
                 main.settings();
             },
