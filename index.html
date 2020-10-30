@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <title>Spaces+</title>
-        <link rel="icon" href="favicon.png">
+        <link rel="icon" href="https://spaces-dev.github.io/SpacesPlus/icons/logo_32.png">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js"></script>
@@ -85,14 +85,14 @@
         </svg>
     </a>
     <div class="container container-main">
-        <div class="alert alert-info" role="alert">У нас появилась неофициальная платформа с документацией <a href="/api" class="alert-link">API Methods</a><p class="pull-right"><span class="badge badge-danger">BETA</span></p></div>
+        <div class="alert alert-info" role="alert">У нас появилась неофициальная платформа с документацией <a href="/api" class="alert-link">API Methods</a><p class="pull-right"><span class="badge badge-warning">УСТАРЕЛО</span></p></div>
         <div class="card mb-4">
             <h5 class="card-header">Установка</h5>
             <div class="card-body">
                 <div class="card-text mt-4">
                     <ol>
                         <li>
-                            <p>Установите один из доступных расширений для вашего браузера <a href="https://www.tampermonkey.net" target="_blank">Tampermonkey</a> или <a href="https://www.greasespot.net" target="_blank">Greasemonkey</a> и <a href="https://violentmonkey.github.io" target="_blank">Violentmonkey</a></p>
+                            <p>Установите один из доступных расширений для вашего браузера <a href="https://www.tampermonkey.net" target="_blank">Tampermonkey</a> или <a href="https://www.greasespot.net" target="_blank">Greasemonkey</a>, <a href="https://violentmonkey.github.io" target="_blank">Violentmonkey</a></p>
                             <ul>
                                 <li><a href="https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo" target="_blank">Google Chrome</a></li>
                                 <li><a href="https://addons.mozilla.org/ru/firefox/addon/greasemonkey/" target="_blank">Mozilla Firefox</a></li>
@@ -104,12 +104,7 @@
                     </ol>
                     <ol start="2">
                         <li>
-                            <p>Установка Spaces+</p>
-                            <p>Вы можете установить этот скрипт через <code>GreasyFork</code> или <code>GitHub</code></p>
-                            <ul>
-                                <li>GreasyFork: <a href="https://greasyfork.org/scripts/397890-spaces" target="_blank">https://greasyfork.org/scripts/397890-spaces</a></li>
-                                <li>GitHub: <a href="https://spaces-dev.github.io/spaces-plus.user.js">https://spaces-dev.github.io/spaces-plus.user.js</a></li>
-                            </ul>
+                            <p><a href="https://spaces-dev.github.io/SpacesPlus/spaces-plus.user.js">Нажмите сюда, чтобы установить Spaces+</a></p>
                         </li>
                     </ol>
                 </div>
@@ -147,7 +142,7 @@
                                 <li>Возможность добавлять пользователей в закладки</li>
                                 <li>Кнопка поворота фото/видео в просмотрщике</li>
                                 <li>Кнопка ускорения видео</li>
-                                <li>Открытые разделы удаленных пользователей</li>
+                                <li><s>Открытые разделы удаленных пользователей</s></li>
                                 <li>Прокрутка страницы справа</li>
                                 <li>Скрытие правого меню</li>
                                 <li>Кнопка загрузки трека из плеера</li>
@@ -162,7 +157,7 @@
                                 <li>Бесплатные стикеры</li>
                                 <li>Возвращает кнопку почту и ленты на свои прежние места</li>
                                 <li>Возможность изменять фон сайта</li>
-                                <li>Виджет почты</li>
+                                <li><s>Виджет почты</s></li>
                                 <li>Виджет погоды</li>
                             </ul>
                             <p>Встроенные возможности сайта:</p>
@@ -171,10 +166,11 @@
                                 <li>Вход в Beta-песочницу</li>
                                 <li>Возможность добавить полосу загрузки страницы как на телефоне</li>
                                 <li>Возможность закрепить аудиоплеер в левом меню</li>
+                                <li>Возможность скрыть квест новичка</li>
                             </ul>
                             <p>Дополнительно:</p>
                             <ul>
-                                <li>Редактор cookies</li>
+                                <li><s>Редактор cookies</s></li>
                             </ul>
                         </div>
                     </div>
@@ -184,9 +180,9 @@
                         <div class="card-block col-sm-12">
                             <p class="mt-4">Если вы используете «Импорт и экспорт настроек», то расширение выполнит безопасный запрос на <a href="https://crashmax.ru/api/getJSON">crashmax.ru</a> чтобы получить информацию для валидации JSON во время сохранения его в ваших cookies. Это было сделано для того, чтобы сайт не блокировал доступ к <a href="https://jsonformatter.curiousconcept.com/process">https://jsonformatter.curiousconcept.com/process</a> из-за отсутствующего у него <code>Access-Control-Allow-Origin</code> (<a href="https://developer.mozilla.org/ru/docs/Web/HTTP/CORS/Errors/CORSMissingAllowOrigin">MDN Web Docs</a>) заголовка в HTTP запросе.</p>
                             <script src="https://gist.github.com/crashmax-off/f86350b8a4b85311ac8676a906b973eb.js"></script>
-                            <p class="mt-4">Все остальные опции содержатся в домене, на котором работает расширение (<a href="https://spaces.ru">spaces.ru</a>, <a href="https://spac.me">spac.me</a>, <a href="https://spcs.me">spcs.me</a>, <a href="https://spaces.im">spaces.im</a>, <a href="https://gdespaces.com">gdespaces.com</a>, <a href="https://spac1.com">spac1.com</a> и еще <a href="https://spaces-dev.github.io">spaces-dev.github.io</a>) и никогда не покидает эти домены.</p>
+                            <p class="mt-4">Все остальные опции содержатся в домене, на котором работает расширение (<a href="https://spaces.ru">spaces.ru</a>, <a href="https://spac.me">spac.me</a>, <a href="https://spcs.me">spcs.me</a>, <a href="https://spaces.im">spaces.im</a>, <a href="https://gdespaces.com">gdespaces.com</a>, <a href="https://spac1.com">spac1.com</a>, <a href="https://spac1.net">spac1.net</a> и еще <a href="https://spaces-dev.github.io">spaces-dev.github.io</a>) и никогда не покидает эти домены.</p>
                             <p class="mt-4">Это также открытый исходный код (Актуальный код: <a href="https://github.com/spaces-dev/SpacesPlus">https://github.com/spaces-dev/SpacesPlus</a>, Репозиторий для обновлений: <a href="https://github.com/spaces-dev/spaces-dev.github.io">https://github.com/spaces-dev/spaces-dev.github.io</a>) и как таковой его код может быть пересмотрен на предмет точности настоящего уведомления.</p>
-                            <i>Последнее обновление: 30.09.2020</i>
+                            <i>Последнее обновление: 30.10.2020</i>
                         </div>
                     </div>
                 </div>
@@ -198,7 +194,7 @@
     </div>
     <div class="text-center mt-4 mb-4">Created by <a href="https://crashmax.ru" target="_blank">crashmax</a> with <span class="text-danger">♥</span></div>
     <script>
-        function rever(n){return n?n.toString().split("").join("."):n}$(function(){var n=window.location.hash;n&&$('ul.nav a[href="'+n+'"]').tab("show"),$(".nav-tabs a").click(function(n){$(this).tab("show"),window.location.hash=this.hash})}),$.getJSON("updater.json").done(function(n){$(function(){$.each(n.history,function(n,t){$("#changelog-rel").append('<div class="card-block mt-4 col-sm-12"><div class="header-line">v'+rever(t.build)+'<div class="pull-right">'+t.date+'</div></div><div class="changelog-item">'+t.changes+"</div></div>")})})}),$.getJSON("data.json").done(function(n){$(function(){$.each(n.backgrounds,function(n,t){$("#backgrounds-rel").append('<div class="card-block mt-4 col-sm-2"><img class="card-img-top" src="'+t.url+'"><button type="button" class="clipboard-b btn btn-primary btn-block btn-radius" data-clipboard-text="'+t.url+'">Copy</button></div>')}),$("#bg-badge").append(n.backgrounds.length)}),$(function(){$.each(n.sounds,function(n,t){$("#sounds-rel").append('<div class="card-block mt-4 col-sm-12"><audio src="'+t.url+'" id="'+t.name+'-s" type="'+t.type+'"></audio><div class="input-group"><button class="input-group-addon" onClick="document.getElementById(\''+t.name+'-s\').play()"><i class="fa fa-play"></i></button><input type="text" id="'+t.name+'-c" class="form-control" value="'+t.url+'" readonly><button class="clipboard-s input-group-addon" data-clipboard-target="#'+t.name+'-c"><i class="fa fa-clipboard"></i></button></div></div>')}),$("#sn-badge").append(n.sounds.length)})}),$(function(){new ClipboardJS(".clipboard-b").on("success",function(n){n.clearSelection(),n.trigger.className="clipboard-b btn btn-success btn-block btn-radius",n.trigger.innerHTML="Copied!",window.setTimeout(function(){n.trigger.className="clipboard-b btn btn-primary btn-block btn-radius",n.trigger.innerHTML="Copy"},3e3)})}),$(function(){new ClipboardJS(".clipboard-s").on("success",function(n){n.clearSelection(),n.trigger.innerHTML="Copied!",window.setTimeout(function(){n.trigger.innerHTML='<i class="fa fa-clipboard"></i>'},3e3)})});
+        let path="https://spaces-dev.github.io/SpacesPlus/";function rever(n){return n?n.toString().split("").join("."):n}$(function(){var n=window.location.hash;n&&$('ul.nav a[href="'+n+'"]').tab("show"),$(".nav-tabs a").click(function(n){$(this).tab("show"),window.location.hash=this.hash})}),$.getJSON(path+"updater.json").done(function(n){$(function(){$.each(n.history,function(n,t){$("#changelog-rel").append('<div class="card-block mt-4 col-sm-12"><div class="header-line">v'+rever(t.build)+'<div class="pull-right">'+t.date+'</div></div><div class="changelog-item">'+t.changes+"</div></div>")})})}),$.getJSON(path+"data.json").done(function(n){$(function(){$.each(n.backgrounds,function(n,t){$("#backgrounds-rel").append('<div class="card-block mt-4 col-sm-2"><img class="card-img-top" src="'+path+"backgrounds/"+t+'"><button type="button" class="clipboard-b btn btn-primary btn-block btn-radius" data-clipboard-text="'+path+"backgrounds/"+t+'">Copy</button></div>')}),$("#bg-badge").append(n.backgrounds.length)}),$(function(){$.each(n.sounds,function(n,t){let a=t.split(".")[0];$("#sounds-rel").append('<div class="card-block mt-4 col-sm-12"><audio src="'+path+"sounds/"+t+'" id="'+a+'-s" type="audio/ogg"></audio><div class="input-group"><button class="input-group-addon" onClick="document.getElementById(\''+a+'-s\').play()"><i class="fa fa-play"></i></button><input type="text" id="'+a+'-c" class="form-control" value="'+path+"sounds/"+t+'" readonly><button class="clipboard-s input-group-addon" data-clipboard-target="#'+a+'-c"><i class="fa fa-clipboard"></i></button></div></div>')}),$("#sn-badge").append(n.sounds.length)})}),$(function(){new ClipboardJS(".clipboard-b").on("success",function(n){n.clearSelection(),n.trigger.className="clipboard-b btn btn-success btn-block btn-radius",n.trigger.innerHTML="Copied!",window.setTimeout(function(){n.trigger.className="clipboard-b btn btn-primary btn-block btn-radius",n.trigger.innerHTML="Copy"},3e3)})}),$(function(){new ClipboardJS(".clipboard-s").on("success",function(n){n.clearSelection(),n.trigger.innerHTML="Copied!",window.setTimeout(function(){n.trigger.innerHTML='<i class="fa fa-clipboard"></i>'},3e3)})});
     </script>
 </body>
 </html>

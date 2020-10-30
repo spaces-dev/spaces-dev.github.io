@@ -1,23 +1,12 @@
-# Spaces+
+SpacesPlus — Powerfull userscript for Spaces.ru
+===============================================
 
-![GitHub last commit](https://img.shields.io/github/last-commit/spaces-dev/spaces-dev.github.io?style=flat-square)
-[![HitCount](https://hits.dwyl.com/spaces-dev/spaces-dev.github.io.svg)](https://hits.dwyl.com/spaces-dev/spaces-dev.github.io)
-![Website](https://img.shields.io/website?down_message=down&label=spaces.ru&style=flat-square&up_message=online&url=https%3A%2F%2Fspaces.ru)
-![Website](https://img.shields.io/website?down_message=down&label=spaces.im&style=flat-square&up_message=online&url=https%3A%2F%2Fspaces.im)
-![Website](https://img.shields.io/website?down_message=down&label=spac.me&style=flat-square&up_message=online&url=https%3A%2F%2Fspac.me)
-![Website](https://img.shields.io/website?down_message=down&label=spcs.me&style=flat-square&up_message=online&url=https%3A%2F%2Fspcs.me)
-![Website](https://img.shields.io/website?down_message=down&label=gdespaces.com&style=flat-square&up_message=online&url=https%3A%2F%2Fgdespaces.com)
-[![MIT License](https://img.shields.io/apm/l/atomic-design-ui.svg?style=flat-square)](https://github.com/spaces-dev/spaces-dev.github.io/blob/master/LICENSE)
+![Version](https://img.shields.io/github/package-json/v/spaces-dev/SpacesPlus?color=blue)
+![Travis](https://img.shields.io/travis/spaces-dev/SpacesPlus)
+![GitHub](https://img.shields.io/github/license/spaces-dev/spaces-dev.github.io?label=license&color=brightgreen)
 
-## Installation
-
-- [More Info](https://spaces-dev.github.io/)
-
-## Contacts
-
-- [Developer](https://t.me/crashmax)
-- [Telegram chat](https://t.me/spaces_dev "Bugs and discussion")
-
-## License
-
-- MIT
+- Полезные ссылки:
+    - [Исходный код](https://github.com/spaces-dev/SpacesPlus)
+    - [Сайт Spaces+](https://spaces-dev.github.io)
+    - [Telegram чат](https://t.me/spaces_dev)
+    - [Spaces группа](https://spaces.im/soo/extension)
