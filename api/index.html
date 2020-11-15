@@ -142,6 +142,7 @@
             </div>
         </div>
         <div class="container">
+            <div v-if="userData.sid === '' || userData.CK === ''" class="alert alert-danger" role="alert">Отсутствуют настройки, <a href="#" class="alert-link">перейти к настройкам</a></div>
             <div class="row row-contain">
                 <div class="col-lg-3 sidebar">
                     <ul class="interface-list m-0">
@@ -159,18 +160,18 @@
                             <div class="card-header">Настройки</div>
                             <div class="card-body row">
                                 <div class="form-group col-md-6">
-                                    <label for="form-sid">sid</label>
+                                    <label for="form-sid">SID</label>
                                     <input type="text" :class="[
                                         'form-control',
                                         isFieldValid('sid') ? 'is-valid' : 'is-invalid'
-                                    ]" id="form-sid" placeholder="9564338168134962" v-model="userData.sid">
+                                    ]" id="form-sid" placeholder="yhvSWtLFq3OnnUSz5Ib4" v-model="userData.sid">
                                 </div>
                                 <div class="form-group col-md-6">
-                                    <label for="form-ck">CSRF (последние 4 цифры sid)</label>
+                                    <label for="form-ck">CK</label>
                                     <input type="text" :class="[
                                         'form-control',
                                         isFieldValid('CK') ? 'is-valid' : 'is-invalid'
-                                    ]" id="form-ck" placeholder="4962" v-model="userData.CK">
+                                    ]" id="form-ck" placeholder="007667" v-model="userData.CK">
                                 </div>
                             </div>
                         </div>
