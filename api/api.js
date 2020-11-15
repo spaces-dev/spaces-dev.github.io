@@ -118,6 +118,10 @@
             renderParameters(method) {
                 const parameters = new URLSearchParams()
 
+                if (this.userData.sid) {
+                    parameters.set('sid', this.userData.sid)
+                }
+
                 if (this.userData.CK) {
                     parameters.set('CK', this.userData.CK)
                 }
