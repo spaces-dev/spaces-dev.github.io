@@ -1,12 +1,12 @@
-SpacesPlus — Powerfull userscript for Spaces.ru
+Spaces Plus — Powerfull userscript for Spaces.im
 ===============================================
 
-![Version](https://img.shields.io/github/package-json/v/spaces-dev/SpacesPlus?color=blue)
-![Travis](https://img.shields.io/travis/spaces-dev/SpacesPlus)
+![Version](https://img.shields.io/github/package-json/v/spaces-dev/spaces-plus?color=blue)
+![Travis](https://img.shields.io/travis/spaces-dev/spaces-plus)
 ![GitHub](https://img.shields.io/github/license/spaces-dev/spaces-dev.github.io?label=license&color=brightgreen)
 
 - Полезные ссылки:
-    - [Исходный код](https://github.com/spaces-dev/SpacesPlus)
-    - [Сайт Spaces+](https://spaces-dev.github.io)
-    - [Telegram чат](https://t.me/spaces_dev)
-    - [Spaces группа](https://spaces.im/soo/extension)
+    - [Исходный код](https://github.com/spaces-dev/spaces-plus)
+    - [Сайт Spaces Plus](https://spaces-dev.github.io/spaces-plus/)
+    - [Telegram чат Spaces Developers](https://t.me/spaces_dev)
+    - [Группа на Spaces](https://spaces.im/soo/extension)
